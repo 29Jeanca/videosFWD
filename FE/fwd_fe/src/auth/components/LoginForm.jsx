@@ -1,4 +1,4 @@
-import{ useState } from "react";
+import { useState } from "react";
 import {
   Grid,
   Box,
@@ -9,6 +9,7 @@ import {
   IconButton,
   Paper,
   CssBaseline,
+  CircularProgress,
 } from "@mui/material";
 import { LightMode, DarkMode, Visibility } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -16,15 +17,33 @@ import { loginUser } from "../services/validate";
 
 const LoginForm = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [charging, setCharging] = useState(false);
+  const [error, setError] = useState(null);
 
-  const validateUser = async()=>{
-     const userCredentials = {email,password};
-     const response=await loginUser(email,password);
-      console.log(userCredentials);
+  const validateUser = async () => {
+    setCharging(true);
+    try {
+      const response = await loginUser(email, password);
+      console.log({ email, password });
       console.log(response);
-  }
+
+      if (response.status === 200) {
+        console.log("Todo good");
+      } else {
+        setError(<response className="message"></response> || "Error al iniciar sesión");
+        setTimeout(() => {
+          setError(null);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      setError("Error al iniciar sesión");
+    } finally {
+      setCharging(false);
+    }
+  };
 
   const theme = createTheme({
     palette: {
@@ -57,6 +76,7 @@ const LoginForm = () => {
           color: "text.primary",
         }}
       >
+        {/* BOTÓN MODO OSCURO */}
         <Box sx={{ position: "absolute", top: 24, right: 24 }}>
           <IconButton onClick={() => setDarkMode(!darkMode)} color="inherit">
             {darkMode ? (
@@ -67,6 +87,7 @@ const LoginForm = () => {
           </IconButton>
         </Box>
 
+        {/* IMAGEN IZQUIERDA */}
         <Grid
           item
           xs={12}
@@ -84,31 +105,13 @@ const LoginForm = () => {
             justifyContent: "flex-start",
           }}
         >
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              bgcolor: "rgba(0,0,0,0.5)",
-            }}
-          />
-          <Box
-            sx={{
-              position: "relative",
-              zIndex: 1,
-              p: 6,
-              color: "white",
-              width: "100%",
-            }}
-          >
+          <Box sx={{ position: "absolute", inset: 0, bgcolor: "rgba(0,0,0,0.5)" }} />
+          <Box sx={{ position: "relative", zIndex: 1, p: 6, color: "white", width: "100%" }}>
             <Typography variant="h4" fontWeight="bold">
               Forward Freedom And Technology.
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ mt: 1, maxWidth: 400, opacity: 0.8 }}
-            >
-              Accede a tus clases grabadas y materiales de estudio en cualquier
-              momento y lugar.
+            <Typography variant="body1" sx={{ mt: 1, maxWidth: 400, opacity: 0.8 }}>
+              Accede a tus clases grabadas y materiales de estudio en cualquier momento y lugar.
             </Typography>
           </Box>
         </Grid>
@@ -132,11 +135,9 @@ const LoginForm = () => {
         >
           <Box sx={{ width: "100%", maxWidth: 800, textAlign: "center" }}>
             <Box sx={{ mb: 4 }}>
-              <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrTBh0Ii2lnLKXuczF2CqJO9Nb7bFpy5ORJ27Hv-2moQ78UchJd8DMxo01kSEeG5C6zn5jCtK1W56RwIMj3DO2xRI0kONywpMUuLvCiCG1VGgTIGF8f1TW0-iSsTyU5b-yv7B2D6cBqHkmlSoFj3Hu6AXxM4OgUDl_xLsc7uNsTQsiaAkONgTWxEmtkTFBMl4EDys0N3tp6Gcd6NH5Pf9Lps8g9TLUxdZbhhaYqZ4eZ8Rc7zJPLbC7lAMKOsPrruqEBC2CQgxe-RrU"
-                alt="Logo FWD"
-                style={{ height: 48 }}
-              />
+              <Typography variant="h3" fontWeight="bold" color="primary">
+                FWD
+              </Typography>
             </Box>
 
             <Typography variant="h5" fontWeight="bold">
@@ -162,7 +163,7 @@ const LoginForm = () => {
                     fullWidth
                     type="password"
                     placeholder="Ingresa tu contraseña"
-                    value = {password}
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <IconButton
@@ -178,26 +179,35 @@ const LoginForm = () => {
                 </Box>
               </Box>
 
-              <Button
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  textTransform: "none",
-                }}
-                onClick={validateUser}
-              >
-                Iniciar Sesión
-              </Button>
+              <Box sx={{ position: "relative", mt: 4 }}>
+                {charging ? (
+                  <CircularProgress size={30} sx={{ position: "relative", left: "0%", top: "50%", transform: "translate(-50%, -50%)" }} />
+                ) : (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      py: 1.5,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    position: "relative",
+                  }}
+                  onClick={validateUser}
+                  disabled={charging}
+                >
+                    Iniciar Sesión
+                </Button>
+                  )}
+              </Box>
+
+              {error && (
+                <Typography color="error" sx={{ mt: 2 }}>
+                  {error}
+                </Typography>
+              )}
 
               <Box sx={{ textAlign: "center", mt: 2 }}>
-                <Link
-                  href="#"
-                  underline="hover"
-                  sx={{ color: "primary.main", fontWeight: 500 }}
-                >
+                <Link href="#" underline="hover" sx={{ color: "primary.main", fontWeight: 500 }}>
                   Olvidé mi contraseña
                 </Link>
               </Box>
