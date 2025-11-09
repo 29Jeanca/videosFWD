@@ -34,9 +34,10 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.CookieJWTAuthentication',
     ),
 }
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
@@ -76,9 +77,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'fwd_be.wsgi.application'
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # o el dominio de tu frontend
+]
+CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 

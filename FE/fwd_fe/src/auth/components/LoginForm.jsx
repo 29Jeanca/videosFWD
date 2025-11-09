@@ -14,6 +14,7 @@ import {
 import { LightMode, DarkMode, Visibility } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { loginUser } from "../services/validate";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -21,18 +22,19 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [charging, setCharging] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const validateUser = async () => {
     setCharging(true);
     try {
       const response = await loginUser(email, password);
-      console.log({ email, password });
       console.log(response);
 
-      if (response.status === 200) {
+      if (response.message === "Login exitoso") {
         console.log("Todo good");
+        navigate("/profile");
       } else {
-        setError(<response className="message"></response> || "Error al iniciar sesión");
+        setError(response.message || "Error al iniciar sesión");
         setTimeout(() => {
           setError(null);
         }, 2000);
