@@ -78,7 +78,6 @@ const LoginForm = () => {
           color: "text.primary",
         }}
       >
-        {/* BOTÓN MODO OSCURO */}
         <Box sx={{ position: "absolute", top: 24, right: 24 }}>
           <IconButton onClick={() => setDarkMode(!darkMode)} color="inherit">
             {darkMode ? (

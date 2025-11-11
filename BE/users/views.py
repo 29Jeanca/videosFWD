@@ -1,3 +1,4 @@
+from .authentication import CookieJWTAuthentication 
 from django.shortcuts import render
 from rest_framework import generics
 from .models import User
@@ -9,6 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 
 class UserCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -54,7 +57,6 @@ class UserLogin(TokenObtainPairView):
             }
         }, status=200)
 
-        # Cookies seguras
         response.set_cookie(
             key="access_token",
             value=access_token,
@@ -74,12 +76,51 @@ class UserLogin(TokenObtainPairView):
 
         return response
 
-from .authentication import CookieJWTAuthentication  # importa tu clase
-
 class UserProfileView(APIView):
-    authentication_classes = [CookieJWTAuthentication]  # ✅ obligatorio
+    authentication_classes = [CookieJWTAuthentication]  
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+class UserProfileUptadeView(APIView):
+    authentication_classes = [CookieJWTAuthentication]  
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        # Usuario que inicia sesion
+        user_login = request.user
+
+        # Datos que se van a actualizar
+        username = request.data.get('username')
+        email = request.data.get('email')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        password = request.data.get('password')
+        profile_picture = request.data.get('profile_picture')
+
+        if username:
+            user_login.username = username
+        if email:
+            user_login.email = email
+        if first_name:
+            user_login.first_name = first_name
+        if last_name:
+            user_login.last_name = last_name
+        if profile_picture:
+            user_login.profile_picture = profile_picture
+        if password:
+            user_login.set_password(password)
+        
+        user_login.save()
+
+        return Response({'message':"User profile updated successfully."})
+
+
+
+
+
+
+def get_csrf_token(request):
+    return JsonResponse({'csrfToken': get_token(request)})

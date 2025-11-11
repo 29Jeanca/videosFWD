@@ -36,13 +36,6 @@ export default function ProfilePage() {
               Aquí puedes ver tu progreso y acceder a tus clases.
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<Edit />}
-            sx={{ borderRadius: 2, textTransform: "none" }}
-          >
-            Editar Perfil
-          </Button>
         </Box>
 
         <Grid container spacing={3}>

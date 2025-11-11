@@ -10,12 +10,12 @@ export default function GeneralProgress() {
         <Box mb={1} display="flex" justifyContent="space-between">
           <Typography>Progreso Total</Typography>
           <Typography fontWeight={700} color="primary.main">
-            65%
+            0%
           </Typography>
         </Box>
         <LinearProgress
           variant="determinate"
-          value={65}
+          value={0}
           sx={{ height: 8, borderRadius: 5, mb: 1 }}
         />
         <Typography variant="body2" color="text.secondary">

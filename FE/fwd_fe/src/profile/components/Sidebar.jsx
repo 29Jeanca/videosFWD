@@ -67,7 +67,7 @@ export default function Sidebar() {
           <School sx={{ color: "white" }} />
         </Box>
         <Typography variant="h6" fontWeight={700}>
-          FWD Bootcamp
+          Forward Costa Rica
         </Typography>
       </Box>
 
