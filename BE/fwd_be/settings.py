@@ -84,6 +84,9 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
+CSRF_COOKIE_HTTPONLY = False  # Para que React pueda leerla con getCookie()
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
