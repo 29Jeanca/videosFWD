@@ -1,3 +1,17 @@
+export function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
 const getUserProfile = async () => {
   const response = await fetch("http://localhost:8000/users/me/", {
     method: "GET",
@@ -6,16 +20,11 @@ const getUserProfile = async () => {
   const data = await response.json();
   return data;
 };
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
 
 const patchUserProfile = async (userData) => {
   const csrftoken = getCookie("csrftoken"); 
 
-  const response = await fetch(`http://127.0.0.1:8000/users/me/update/`, {
+  const response = await fetch(`http://localhost:8000/users/me/update/`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

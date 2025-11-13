@@ -6,8 +6,17 @@ import Courses from "../components/Courses";
 import { Edit } from "@mui/icons-material";
 import { getUserProfile } from "../services/validate";
 import { useEffect, useState } from "react";
+import {useNavigate} from 'react-router-dom';
 export default function ProfilePage() {
   const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+     useEffect(() => {
+  fetch("http://127.0.0.1:8000/users/csrf/", {
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => console.log("CSRF token obtenido:", data));
+}, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -15,7 +24,7 @@ export default function ProfilePage() {
         const data = await getUserProfile();
         setUserData(data);
         console.log(data);
-        
+        navigate('/profile');
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
