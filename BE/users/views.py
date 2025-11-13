@@ -126,3 +126,11 @@ class UserProfileUptadeView(APIView):
 def get_csrf_token(request):
     token = get_token(request)
     return Response({"csrfToken": token})
+
+class LogoutView(APIView):
+    def post(self, request):
+        response = Response({"message": "Sesión cerrada correctamente"})
+        response.delete_cookie("access_token", path="/")
+        response.delete_cookie("refresh_token", path="/")
+        response.delete_cookie("csrftoken", path="/")
+        return response

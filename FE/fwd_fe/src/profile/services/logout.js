@@ -1,6 +1,11 @@
-const logoutUser = (page) => {
-  document.cookie = "access=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  window.location.href = page; 
+const logoutUser = async () => {
+  try {
+    await fetch("http://localhost:8000/users/logout/", {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (err) {
+    console.error("Error al cerrar sesión:", err);
+  } 
 };
 export { logoutUser };

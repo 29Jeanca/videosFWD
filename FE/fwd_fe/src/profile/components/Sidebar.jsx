@@ -19,10 +19,12 @@ import {
 import { logoutUser } from "../services/logout";
 import { getUserProfile } from "../services/validate";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 export default function Sidebar({profile,profileActive=true,community,communityActive,calendar,calendarActive,courses,coursesActive}) {
   const [userData, setUserData] = useState(null);
      console.log(courses);
      console.log(coursesActive);
+      const navigate = useNavigate();
     useEffect(() => {
       const fetchUserData = async () => {
         try {
@@ -165,9 +167,10 @@ export default function Sidebar({profile,profileActive=true,community,communityA
       <Box mt="auto">
         <Divider sx={{ my: 2 }} />
         <ListItemButton sx={{ borderRadius: 2 }}>
-          <ListItemIcon 
-              onClick={() => logoutUser("/")}
-          >
+          <ListItemIcon onClick={async()=>{
+            await logoutUser();
+            navigate('/');
+          }}>
             <Logout
             />
           </ListItemIcon>

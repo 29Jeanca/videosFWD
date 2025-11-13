@@ -15,6 +15,8 @@ import { useNavigate } from "react-router-dom";
 export default function CommunityPage() {
   const [createdPost,setCreatedPost] = useState([])
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
   const formaterDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CR", {
@@ -35,6 +37,7 @@ export default function CommunityPage() {
           setCreatedPost([]);
           navigate('/');
         }
+        setLoading(false);
       } catch (error) {
         console.error("Error al obtener las discusiones:", error);
       }
@@ -93,6 +96,8 @@ export default function CommunityPage() {
           <Stack spacing={2}>
             {createdPost.length === 0 ? (
               <Box mt={4}>No hay discusiones disponibles.</Box>
+            ) : loading ? (
+              <Box mt={4}>Cargando discusiones...</Box>
             ) : (
               createdPost.map((d, i) => (
                 <DiscussionCard key={i}
