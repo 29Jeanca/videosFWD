@@ -35,7 +35,56 @@ const patchUserProfile = async (userData) => {
   });
 
   const data = await response.json();
+  if(data.detail==="Authentication credentials were not provided."){
+    return null;
+  }
   return data;
 };
 
-export {getUserProfile, patchUserProfile}
+const getData = async ()=>{
+  const csrftoken = getCookie("csrftoken"); 
+
+  const response = await fetch(`http://localhost:8000/community/create-post/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken, 
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  
+  return data;
+}
+const getCategories = async ()=>{
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/create-category/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+
+const getPostComments = async (postId)=>{
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/post-comments/${postId}/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+
+export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments};

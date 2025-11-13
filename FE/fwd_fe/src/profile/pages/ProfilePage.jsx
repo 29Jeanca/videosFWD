@@ -7,9 +7,13 @@ import { Edit } from "@mui/icons-material";
 import { getUserProfile } from "../services/validate";
 import { useEffect, useState } from "react";
 import {useNavigate} from 'react-router-dom';
+import CommunityPage from "../profile_community/pages/CommunityPage";
 export default function ProfilePage() {
   const [userData, setUserData] = useState(null);
+  const [showUserProfile, setShowUserProfile] = useState(true);
+  const [showCommunity, setShowCommunity] = useState(false);
   const navigate = useNavigate();
+  
      useEffect(() => {
   fetch("http://127.0.0.1:8000/users/csrf/", {
     credentials: "include",
@@ -24,17 +28,30 @@ export default function ProfilePage() {
         const data = await getUserProfile();
         setUserData(data);
         console.log(data);
-        navigate('/profile');
+        if(data.detail == "Authentication credentials were not provided."){
+          navigate('/');
+        }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
     };
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
   return (
     <Box display="flex" flexDirection={{ xs: "column", md: "row" }}>
-      <Sidebar />
+      <Sidebar profile={()=>{
+        setShowUserProfile(true)
+        setShowCommunity(false)
+
+      }}
+      profileActive={showUserProfile}
+      community={()=>{
+        setShowCommunity(true)
+        setShowUserProfile(false)
+      }}
+      communityActive={showCommunity}
+      />
       <Box flex={1} p={{ xs: 2, md: 5 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
           <Box>
@@ -46,7 +63,11 @@ export default function ProfilePage() {
             </Typography>
           </Box>
         </Box>
-
+      
+        {/* 
+          Perfil y progreso general
+        */}
+        {showUserProfile && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <PersonalInfo />
@@ -58,6 +79,17 @@ export default function ProfilePage() {
             <Courses />
           </Grid>
         </Grid>
+        )}
+        {/* 
+          Comunidad
+        */}
+        {showCommunity && (
+          <CommunityPage/>
+        )}
+
+        {/* 
+          Candelario
+        */}
       </Box>
     </Box>
   );

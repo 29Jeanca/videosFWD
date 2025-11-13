@@ -19,14 +19,20 @@ import {
 import { logoutUser } from "../services/logout";
 import { getUserProfile } from "../services/validate";
 import { useEffect, useState } from "react";
-export default function Sidebar() {
+export default function Sidebar({profile,profileActive=true,community,communityActive,calendar,calendarActive,courses,coursesActive}) {
   const [userData, setUserData] = useState(null);
+     console.log(courses);
+     console.log(coursesActive);
     useEffect(() => {
       const fetchUserData = async () => {
         try {
           const data = await getUserProfile();
           setUserData(data);
           console.log(data);
+
+       
+          
+          
           
         } catch (error) {
           console.error("Failed to fetch user data:", error);
@@ -34,12 +40,6 @@ export default function Sidebar() {
       };
       fetchUserData();
     }, []);
-  const menuItems = [
-    { icon: <Person />, label: "Mi Perfil", active: true },
-    { icon: <Book />, label: "Mis Cursos" },
-    { icon: <Group />, label: "Comunidad" },
-    { icon: <CalendarMonth />, label: "Calendario" },
-  ];
 
   return (
     <Box
@@ -51,7 +51,7 @@ export default function Sidebar() {
         p: 2,
         display: "flex",
         flexDirection: "column",
-        height: { xs: "auto", md: "100vh" },
+        height: { xs: "auto", md: "auto" },
       }}
     >
       <Box display="flex" alignItems="center" gap={1} mb={3}>
@@ -85,10 +85,9 @@ export default function Sidebar() {
       </Box>
 
       <List>
-        {menuItems.map((item) => (
           <ListItemButton
-            key={item.label}
-            selected={item.active}
+            onClick={profile}
+            selected={profileActive}
             sx={{
               borderRadius: 2,
               mb: 0.5,
@@ -99,11 +98,69 @@ export default function Sidebar() {
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.label} />
+            <ListItemIcon sx={{ minWidth: 36 }} onClick={profile}>
+              <Person  />
+            </ListItemIcon>
+            <ListItemText primary={'Perfil'} />
           </ListItemButton>
-        ))}
-      </List>
+
+          {/* <ListItemButton
+            onClick={courses}
+            selected={coursesActive}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              "&.Mui-selected": {
+                bgcolor: "primary.main",
+                color: "white",
+                "& .MuiSvgIcon-root": { color: "white" },
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 36 }} onClick={courses}>
+              <Book />
+            </ListItemIcon>
+            <ListItemText primary={'Cursos'} />
+          </ListItemButton> */}
+
+          <ListItemButton
+            onClick={community}
+            selected={communityActive}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              "&.Mui-selected": {
+                bgcolor: "primary.main",
+                color: "white",
+                "& .MuiSvgIcon-root": { color: "white" },
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 36 }} onClick={community}>
+              <Group />
+            </ListItemIcon>
+            <ListItemText primary={'Comunidad'} />
+          </ListItemButton>
+          
+          <ListItemButton
+            onClick={calendar}
+            selected={calendarActive}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              "&.Mui-selected": {
+                bgcolor: "primary.main",
+                color: "white",
+                "& .MuiSvgIcon-root": { color: "white" },
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 36 }} onClick={calendar}>
+              <CalendarMonth />
+            </ListItemIcon>
+            <ListItemText primary={'Calendario'} />
+          </ListItemButton>
+        </List>
 
       <Box mt="auto">
         <Divider sx={{ my: 2 }} />

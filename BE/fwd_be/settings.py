@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     'users',
+    'community',
 ]
 AUTH_USER_MODEL = 'users.User'
 
@@ -86,7 +87,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
-CSRF_COOKIE_HTTPONLY = False  # Para que React pueda leerla con getCookie()
+CSRF_COOKIE_HTTPONLY = False  
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

@@ -32,7 +32,7 @@ const LoginForm = () => {
 
       if (response.message === "Login exitoso") {
         console.log("Todo good");
-        navigate("/profile");
+        navigate("/perfil");
       } else {
         setError(response.message || "Error al iniciar sesión");
         setTimeout(() => {
