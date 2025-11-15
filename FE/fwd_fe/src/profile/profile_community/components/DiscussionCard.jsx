@@ -7,8 +7,21 @@ import {
   Chip,
 } from "@mui/material";
 import { Forum, ThumbUp } from "@mui/icons-material";
+import { useRelativeTime } from "../hooks/useRelativeTime"; // <-- agregado
 
-export default function DiscussionCard({ user, time, title, tag, comments, likes, avatar, onLike }) {
+export default function DiscussionCard({ 
+  user, 
+  createdAt,    // <-- antes era time
+  title, 
+  tag, 
+  comments, 
+  likes, 
+  avatar, 
+  onLike 
+}) {
+
+  const time = useRelativeTime(createdAt); // <-- calcula "hace 2h", "hace 3 días", etc.
+
   return (
     <Card
       variant="outlined"
@@ -35,9 +48,13 @@ export default function DiscussionCard({ user, time, title, tag, comments, likes
                 <Typography variant="body2">{comments}</Typography>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <ThumbUp fontSize="small" cursor="pointer"  onClick={()=>{
-                  onLike();
-                }}/>
+                <ThumbUp 
+                  fontSize="small" 
+                  cursor="pointer"
+                  onClick={() => {
+                    onLike();
+                  }}
+                />
                 <Typography variant="body2">{likes}</Typography>
               </Stack>
             </Stack>

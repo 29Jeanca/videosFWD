@@ -16,7 +16,6 @@ export default function CommunityPage() {
   const [likesByPost, setLikesByPost] = useState({});
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
   const formaterDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CR", {
@@ -64,7 +63,7 @@ export default function CommunityPage() {
   }, [navigate]);
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4}}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={8} lg={9}>
           <Header />
@@ -81,7 +80,7 @@ export default function CommunityPage() {
                 <DiscussionCard
                   key={i}
                   user={d.user_name}
-                  time={formaterDate(d.created_at)}
+                  createdAt={d.created_at}
                   title={d.title}
                   tag={d.category_name}
                   likes={likesByPost[d.id] ?? 0}
