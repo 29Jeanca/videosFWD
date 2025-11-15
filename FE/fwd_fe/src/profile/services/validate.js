@@ -44,7 +44,7 @@ const patchUserProfile = async (userData) => {
 const getData = async ()=>{
   const csrftoken = getCookie("csrftoken"); 
 
-  const response = await fetch(`http://localhost:8000/community/create-post/`, {
+  const response = await fetch(`http://localhost:8000/community/posts/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -87,4 +87,48 @@ const getPostComments = async (postId)=>{
   return data;
 }
 
-export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments};
+const postLikeUnlike = async (postId) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/like-unlike-post/${postId}/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+const getLikedPosts = async (postId) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/likes-by-post/${postId}/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+const newPost = async (postData) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/create-post/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+    body: JSON.stringify(postData),
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+  
+export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments,postLikeUnlike,getLikedPosts,newPost};

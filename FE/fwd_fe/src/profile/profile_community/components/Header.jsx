@@ -1,7 +1,15 @@
 import { Box, Typography, Button, Stack } from "@mui/material";
 import { Add } from "@mui/icons-material";
-
+import { useState } from "react";
+import CreateTopicModal from "./CreateTopicModal";
 export default function Header() {
+  const [openModal,setOpenModal] = useState(false);
+
+  const handleOpenModal = () =>{
+    setOpenModal(true);
+  }
+
+
   return (
     <Stack
       direction={{ xs: "column", sm: "row" }}
@@ -24,10 +32,12 @@ export default function Header() {
           variant="contained"
           startIcon={<Add />}
           sx={{ fontWeight: "bold" }}
+          onClick={handleOpenModal}
         >
           Crear Nuevo Tema
         </Button>
       </Stack>
+      <CreateTopicModal open={openModal} onClose={() => setOpenModal(false)} />
     </Stack>
   );
 }

@@ -25,7 +25,7 @@ class UserLogin(APIView):
 
         if not email or not password:
             return Response({"message": "Email y contraseña son requeridos."}, status=400)
-
+        
         username_email = User.objects.filter(email=email).values_list("username", flat=True).first()
 
         if username_email is None:

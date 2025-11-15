@@ -31,11 +31,6 @@ export default function Sidebar({profile,profileActive=true,community,communityA
           const data = await getUserProfile();
           setUserData(data);
           console.log(data);
-
-       
-          
-          
-          
         } catch (error) {
           console.error("Failed to fetch user data:", error);
         }

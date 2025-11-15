@@ -1,28 +1,20 @@
 import { Stack, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getCategories } from "../../services/validate";
-export default function CategoryChips() {
-   const [categories, setCategories] = useState([]);
-  
-    useEffect(()=>{
-      const fetchCategories = async () => {
-        try {
-          const response = await getCategories();
-          console.log("Discusiones obtenidas:", response);
-          setCategories(response);
-        } catch (error) {
-          console.error("Error al obtener las discusiones:", error);
-        }
+export default function CategoryChips({ clickedCategory, valueCategory }) {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories();
+        setCategories(response);
+      } catch (error) {
+        console.error("Error al obtener las categorias:", error);
       }
-      fetchCategories();
-    },[])
-  // const categories = [
-  //   // "JavaScript",
-  //   // "Diseño UI/UX",
-  //   // "Ayuda General",
-  //   // "Proyectos",
-  //   // "Anuncios",
-  // ];
+    };
+    fetchCategories();
+  }, []);
 
   return (
     <Stack
@@ -44,13 +36,16 @@ export default function CategoryChips() {
           }}
         />
       )}
+
       {categories.map((cat) => (
         <Chip
           key={cat.id}
           label={cat.name}
+          onClick={() => valueCategory(cat.id)}
           sx={{
-            bgcolor: "action.hover",
-            fontWeight: 500,
+            bgcolor: clickedCategory === cat.id ? "primary.main" : "action.hover",
+            color: clickedCategory === cat.id ? "white" : "text.primary",
+            fontWeight: 600,
           }}
           clickable
         />
@@ -58,3 +53,4 @@ export default function CategoryChips() {
     </Stack>
   );
 }
+

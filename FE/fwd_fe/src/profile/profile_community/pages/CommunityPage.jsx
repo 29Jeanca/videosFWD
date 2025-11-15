@@ -8,12 +8,12 @@ import FeaturedTopics from "../components/FeaturedTopics";
 import UpcomingEvents from "../components/UpcomingEvents";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
-import { getData, getPostComments } from "../../services/validate";
+import { getData, getPostComments, getLikedPosts, postLikeUnlike } from "../../services/validate";
 import { useNavigate } from "react-router-dom";
 
-
 export default function CommunityPage() {
-  const [createdPost,setCreatedPost] = useState([])
+  const [createdPost, setCreatedPost] = useState([]);
+  const [likesByPost, setLikesByPost] = useState({});
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -24,66 +24,44 @@ export default function CommunityPage() {
       month: "long",
       day: "numeric",
     });
-  }
+  };
 
-
-  useEffect(()=>{
-    const fetchPosts = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const response = await getData();
-        console.log("Discusiones obtenidas:", response);
-        setCreatedPost(response);
-        if(response.detail==="Authentication credentials were not provided."){
+        const posts = await getData();
+        setCreatedPost(posts);
+
+        if (posts.detail === "Authentication credentials were not provided.") {
           setCreatedPost([]);
           navigate('/');
+          return;
         }
+
+        const likesObj = {};
+        for (const p of posts) {
+          const res = await getLikedPosts(p.id);
+          likesObj[p.id] = res.length;
+        }
+        setLikesByPost(likesObj);
+
         setLoading(false);
       } catch (error) {
-        console.error("Error al obtener las discusiones:", error);
+        console.error(error);
       }
-    }
+    };
+
     const fetchCommentPost = async () => {
       try {
-        const response = await getPostComments(1); 
-        console.log("Comentarios obtenidos:", response);
+        await getPostComments(1);
+      } catch (error) {
+        console.error(error);
       }
-      catch (error) {
-        console.error("Error al obtener los comentarios:", error);
-      }
-    }
-    fetchPosts();
-    fetchCommentPost();
-  },[navigate])
+    };
 
-  // const discussions = [
-  //   // {
-  //   //   user: "Carlos Ruiz",
-  //   //   time: "hace 2 horas",
-  //   //   title: "¿Alguien más tiene problemas con el state de React en el Proyecto 3?",
-  //   //   tag: "JavaScript",
-  //   //   comments: 5,
-  //   //   likes: 12,
-  //   //   avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDfmNIZwkNvYKkxc5MShpp3-UzVcELEXVFk9ovihIHFsEQ16u52BQyISU8LLcFmp3Glq3Sef-x9ji5alYOG2TkZG4ioDh6VcpbLIEYE9XEHIgxLkV3H7lU08CTmpYMIcMXpupJvZRQSe-lf0oIr7ooA_8Z3vRmhDwDPFUhYREZxRNGR3tQWj6vzJiRunvnM6KTUl7LwTM9nwIMV-OHGEOZPMEA1YIP_h1q68gcmwaDbNUa7MpBTzfr7BZtcwKiCnTqR0j45yNSR6foz",
-  //   // },
-  //   // {
-  //   //   user: "Ana Gómez",
-  //   //   time: "hace 1 día",
-  //   //   title: "Feedback para mi portfolio final",
-  //   //   tag: "Proyectos",
-  //   //   comments: 8,
-  //   //   likes: 21,
-  //   //   avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCyOAtPzjQPds_fdNz5d9TZTyH8TXbhJgN27RjlJP2fvkqWJbbr9p8zAXZvHRvi58erMKgi51nw11MJDhEsVomPhrv-dtr_9JlPjsxdclHvNHKZSV3EiP346Xj6xMJTvAwuj5ZRUnoiLtQtsN44dhiNEg6PsANZ0nb87Lsx3LAzz6Py72qyAc-yoqSXwQ6QpjAif0JWC7_lNKU5qEb3_zLt9Vn0KYGynpzzsF2NFOucM0Xsb_24I3UCDiLNoLTZok6Smg-894HpxT6O",
-  //   // },
-  //   // {
-  //   //   user: "Jorge Torres",
-  //   //   time: "hace 3 días",
-  //   //   title: "Comparto mis recursos favoritos para Diseño UI",
-  //   //   tag: "Diseño UI/UX",
-  //   //   comments: 15,
-  //   //   likes: 45,
-  //   //   avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCmxhYW3-O11mLIEe6ysO-wwE1NoQU81hPzf__7eLigJZWsDU_bwGZR4Fz2w0PEU8zUL9kr4KsqSq433yoZ-qJcDTCs13BJQ1GZehurXf_YSyy3YSgUoKyRtfD5LhQpmGFW1T1GBL6fyJ_Y65f9xWaWG8eQ-F7l8493V5DpEy1uAHG2THCW7P1QP5TN7EgqR-_Zw5KtstTg6I2_H2MmTQF3KYz3upKdeLoyffgU9cOZK5Dm2yXteizaipelIcdvrfQ7ne1uu6PuH9sI",
-  //   // },
-  // ];
+    fetchData();
+    fetchCommentPost();
+  }, [navigate]);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -100,19 +78,33 @@ export default function CommunityPage() {
               <Box mt={4}>Cargando discusiones...</Box>
             ) : (
               createdPost.map((d, i) => (
-                <DiscussionCard key={i}
+                <DiscussionCard
+                  key={i}
                   user={d.user_name}
                   time={formaterDate(d.created_at)}
                   title={d.title}
                   tag={d.category_name}
-                  likes={d.thumbs_up}
-                  avatar={"https://lh3.googleusercontent.com/aida-public/AB6AXuDfmNIZwkNvYKkxc5MShpp3-UzVcELEXVFk9ovihIHFsEQ16u52BQyISU8LLcFmp3Glq3Sef-x9ji5alYOG2TkZG4ioDh6VcpbLIEYE9XEHIgxLkV3H7lU08CTmpYMIcMXpupJvZRQSe-lf0oIr7ooA_8Z3vRmhDwDPFUhYREZxRNGR3tQWj6vzJiRunvnM6KTUl7LwTM9nwIMV-OHGEOZPMEA1YIP_h1q68gcmwaDbNUa7MpBTzfr7BZtcwKiCnTqR0j45yNSR6foz"}
+                  likes={likesByPost[d.id] ?? 0}
+                  onLike={async () => {
+                    const response = await postLikeUnlike(d.id);
+
+                    if (response && response.detail === "Authentication credentials were not provided.") {
+                      navigate('/');
+                      return;
+                    }
+
+                    const res = await getLikedPosts(d.id);
+                    setLikesByPost(prev => ({
+                      ...prev,
+                      [d.id]: res.length
+                    }));
+                  }}
+                  avatar="https://lh3.googleusercontent.com/aida-public/AB6AXuDfmNIZwkNvYKkxc5MShpp3-UzVcELEXVFk9ovihIHFsEQ16u52BQyISU8LLcFmp3Glq3Sef-x9ji5alYOG2TkZG4ioDh6VcpbLIEYE9XEHIgxLkV3H7lU08CTmpYMIcMXpupJvZRQSe-lf0oIr7ooA_8Z3vRmhDwDPFUhYREZxRNGR3tQWj6vzJiRunvnM6KTUl7LwTM9nwIMV-OHGEOZPMEA1YIP_h1q68gcmwaDbNUa7MpBTzfr7BZtcwKiCnTqR0j45yNSR6foz"
                 />
               ))
             )}
           </Stack>
         </Grid>
-
       </Grid>
     </Container>
   );

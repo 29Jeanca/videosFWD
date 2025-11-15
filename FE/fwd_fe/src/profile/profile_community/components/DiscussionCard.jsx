@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Forum, ThumbUp } from "@mui/icons-material";
 
-export default function DiscussionCard({ user, time, title, tag, comments, likes, avatar }) {
+export default function DiscussionCard({ user, time, title, tag, comments, likes, avatar, onLike }) {
   return (
     <Card
       variant="outlined"
@@ -35,7 +35,9 @@ export default function DiscussionCard({ user, time, title, tag, comments, likes
                 <Typography variant="body2">{comments}</Typography>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <ThumbUp fontSize="small" cursor="pointer" />
+                <ThumbUp fontSize="small" cursor="pointer"  onClick={()=>{
+                  onLike();
+                }}/>
                 <Typography variant="body2">{likes}</Typography>
               </Stack>
             </Stack>

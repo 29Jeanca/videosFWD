@@ -1,16 +1,47 @@
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView
-from .models import Post, CategoryPost, CommentPost
-from .serializers import PostSerializer, CategoryPostSerializer, CommentPostSerializer
+from .models import Post, CategoryPost, CommentPost, LikePost
+from .serializers import PostSerializer, CategoryPostSerializer, CommentPostSerializer,LikePostSerializer
 from rest_framework.permissions import IsAuthenticated
 from users.authentication import CookieJWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+
 class PostListCreateView(ListCreateAPIView):
+    method = 'GET'
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
+
+
+class CreatePostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request):
+        user=request.user
+        title = request.data.get('title')
+        content = request.data.get('content')
+        category_id = request.data.get('category')
+        anonymous = request.data.get('anonymous', False)
+
+        if not title or not content or not category_id:
+            return Response({"error":"Faltan campos obligatorios"},status=400)
+        
+        post = Post.objects.create(
+            user=user,
+            title=title,
+            content=content,
+            category_id=category_id,
+            anonymous=anonymous
+        )
+        serializer = PostSerializer(post)
+        post.save()
+        return Response(serializer.data, status=201)
+    
+
 
 class CategoryPostListCreateView(ListCreateAPIView):
     authentication_classes = [CookieJWTAuthentication]
@@ -37,21 +68,28 @@ class LikeUnlikePostView(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def patch(self,request,post_id):
-        try:
-            post=Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return Response({"message":"Post no encontrado."},status=404)
-        
-        action=request.data.get("action")
-        if action=="like":
-            post.thumbs_up+=1
-            post.save()
-            return Response({"message":"Post gustado.","thumbs_up":post.thumbs_up},status=200)
-        elif action=="unlike":
-            if post.thumbs_up>0:
-                post.thumbs_up-=1
-                post.save()
-            return Response({"message":"Post no gustado.","thumbs_up":post.thumbs_up},status=200)
+    def post(self,request,post_id):
+        user = request.user
+        post = Post.objects.get(id=post_id)
+        like_instance = LikePost.objects.filter(user=user, post=post).first()
+
+        if like_instance:
+            like_instance.delete()
+            return Response({"message":"Post unliked"})
         else:
-            return Response({"message":"Acción inválida."},status=400)
+            LikePost.objects.create(user=user, post=post)
+            return Response({"message":"Post liked"})
+        
+
+class GetLikesByPostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,post_id):
+        post = LikePost.objects.filter(post_id=post_id)
+        serializer = LikePostSerializer(post,many=True)
+        
+        return Response(serializer.data)
+
+
+   
