@@ -15,6 +15,15 @@ class PostListCreateView(ListCreateAPIView):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
 
+class GetPostByIdView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,post_id):
+        post = Post.objects.get(id=post_id)
+        serializer = PostSerializer(post)
+        
+        return Response(serializer.data)
 
 class CreatePostView(APIView):
     authentication_classes = [CookieJWTAuthentication]
@@ -56,8 +65,9 @@ class CommentPostListCreateView(ListCreateAPIView):
     serializer_class = CommentPostSerializer
 
 class CommentByPostView(ListCreateAPIView):
-    authentication_classes = [CookieJWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [CookieJWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+
     serializer_class = CommentPostSerializer
 
     def get_queryset(self):

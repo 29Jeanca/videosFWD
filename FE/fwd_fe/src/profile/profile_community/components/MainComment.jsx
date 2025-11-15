@@ -1,8 +1,33 @@
 import { Box, Avatar, Typography, Chip } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import { useEffect, useState } from "react";
+import { getPostById } from "../../services/validate";
 
-export default function MainComment() {
+export default function MainComment({ postId }) {
+  const [contentPost, setContentPost] = useState([]);
+  useEffect(() => {
+    const fetchPostDetails = async () => {
+      try {
+        const data = await getPostById(postId);
+        console.log(data);
+        setContentPost(data);
+      } catch (error) {
+        console.error("Failed to fetch post details:", error);
+      }
+    };
+    fetchPostDetails();
+  }, [postId]);
+
+  const formaterDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-CR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <Box
       sx={{
@@ -19,36 +44,31 @@ export default function MainComment() {
           sx={{ width: 56, height: 56 }}
         />
         <Box>
-          <Typography fontWeight={600}>Carlos Ruiz</Typography>
+          <Typography fontWeight={600}>{contentPost.user_name}</Typography>
           <Typography variant="body2" color="text.secondary">
-            hace 2 horas
+            {formaterDate(contentPost.created_at)}
           </Typography>
         </Box>
       </Box>
 
       <Typography variant="h4" fontWeight={700} mb={2}>
-        ¿Alguien más tiene problemas con el state de React en el Proyecto 3?
+        {contentPost.title}
       </Typography>
 
-      <Typography mb={2}>
-        Hola a todos,
-        <br />
-        Estoy trabajando en el Proyecto 3 y me he encontrado con un problema
-        bastante frustrante con el manejo del estado en React...
-      </Typography>
+      <Typography mb={2}>{contentPost.content}</Typography>
 
       <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-        <Chip label="JavaScript" color="warning" />
+        <Chip label={contentPost.category_name} />
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <ThumbUpIcon fontSize="small" />
-          <Typography>12</Typography>
+          <ThumbUpIcon fontSize="small" cursor="pointer" />
+          <Typography>{1}</Typography>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        {/* <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <BookmarkIcon fontSize="small" />
           <Typography>Guardar</Typography>
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

@@ -16,14 +16,15 @@ export default function CommunityPage() {
   const [likesByPost, setLikesByPost] = useState({});
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const formaterDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-CR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+
+  // const formaterDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString("es-CR", {
+  //     year: "numeric",
+  //     month: "long",
+  //     day: "numeric",
+  //   });
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,6 +79,7 @@ export default function CommunityPage() {
             ) : (
               createdPost.map((d, i) => (
                 <DiscussionCard
+                  onClick={() => navigate(`/post/${d.id}`)}
                   key={i}
                   user={d.user_name}
                   createdAt={d.created_at}

@@ -4,6 +4,7 @@ from .views import CommentPostListCreateView, CommentByPostView
 from .views import LikeUnlikePostView
 from .views import GetLikesByPostView
 from .views import CreatePostView
+from .views import GetPostByIdView
 urlpatterns = [
     path('create-post/', CreatePostView.as_view(), name='create-post'),
     path('posts/', PostListCreateView.as_view(), name='posts-list'),
@@ -12,4 +13,5 @@ urlpatterns = [
     path('post-comments/<int:post_id>/', CommentByPostView.as_view(), name='comments-by-post'),
     path('like-unlike-post/<int:post_id>/', LikeUnlikePostView.as_view(), name='like-unlike-post'),
     path('likes-by-post/<int:post_id>/', GetLikesByPostView.as_view(), name='likes-by-post'),
+    path('post/<int:post_id>/', GetPostByIdView.as_view(), name='get-post-by-id'),
 ]

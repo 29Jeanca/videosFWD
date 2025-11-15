@@ -11,7 +11,7 @@ import {
 import {
   School,
   Person,
-  Book,
+  History,
   Group,
   CalendarMonth,
   Logout,
@@ -20,10 +20,8 @@ import { logoutUser } from "../services/logout";
 import { getUserProfile } from "../services/validate";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-export default function Sidebar({profile,profileActive=true,community,communityActive,calendar,calendarActive,courses,coursesActive}) {
+export default function Sidebar({profile,profileActive=true,community,communityActive,calendar,calendarActive,history,historyActive}) {
   const [userData, setUserData] = useState(null);
-     console.log(courses);
-     console.log(coursesActive);
       const navigate = useNavigate();
     useEffect(() => {
       const fetchUserData = async () => {
@@ -101,9 +99,9 @@ export default function Sidebar({profile,profileActive=true,community,communityA
             <ListItemText primary={'Perfil'} />
           </ListItemButton>
 
-          {/* <ListItemButton
-            onClick={courses}
-            selected={coursesActive}
+          <ListItemButton
+            onClick={history}
+            selected={historyActive}
             sx={{
               borderRadius: 2,
               mb: 0.5,
@@ -114,11 +112,11 @@ export default function Sidebar({profile,profileActive=true,community,communityA
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36 }} onClick={courses}>
-              <Book />
+            <ListItemIcon sx={{ minWidth: 36 }} onClick={history}>
+              <History />
             </ListItemIcon>
-            <ListItemText primary={'Cursos'} />
-          </ListItemButton> */}
+            <ListItemText primary={'Historial'} />
+          </ListItemButton> 
 
           <ListItemButton
             onClick={community}

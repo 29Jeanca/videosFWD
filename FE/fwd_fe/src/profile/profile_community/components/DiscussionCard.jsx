@@ -17,13 +17,15 @@ export default function DiscussionCard({
   comments, 
   likes, 
   avatar, 
-  onLike 
+  onLike,
+  onClick
 }) {
 
   const time = useRelativeTime(createdAt); // <-- calcula "hace 2h", "hace 3 días", etc.
 
   return (
     <Card
+      onClick={onClick}
       variant="outlined"
       sx={{
         borderRadius: 3,

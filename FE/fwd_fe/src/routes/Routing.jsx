@@ -11,7 +11,7 @@ const Routing = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/comunidad" element={<CommunityPage />} />
-        <Route path="/post" element={<PostPage />} />
+        <Route path="/post/:postId" element={<PostPage />} />
       </Routes>
     </Router>
   );

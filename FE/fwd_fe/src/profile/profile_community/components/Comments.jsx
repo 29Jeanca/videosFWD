@@ -6,34 +6,35 @@ import {
   IconButton,
 } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
+import { useEffect, useState } from "react";
+import { getPostComments } from "../../services/validate";
 
-export default function Comments() {
-  const lista = [
-    {
-      id: 1,
-      nombre: "Ana Gómez",
-      tiempo: "hace 1 hora",
-      comentario:
-        "¡Sí! Me pasó exactamente lo mismo. El problema era que estaba mutando el estado directamente...",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCyOAtPzjQPds_fdNz5d9TZTyH8TXbhJgN27RjlJP2fvkqWJbbr9p8zAXZvHRvi58erMKgi51nw11MJDhEsVomPhrv-dtr_9JlPjsxdclHvNHKZSV3EiP346Xj6xMJTvAwuj5ZRUnoiLtQtsN44dhiNEg6PsANZ0nb87Lsx3LAzz6Py72qyAc-yoqSXwQ6QpjAif0JWC7_lNKU5qEb3_zLt9Vn0KYGynpzzsF2NFOucM0Xsb_24I3UCDiLNoLTZok6Smg-894HpxT6O",
-    },
-    {
-      id: 2,
-      nombre: "Jorge Torres",
-      tiempo: "hace 45 minutos",
-      comentario:
-        "Además de lo que dice Ana, revisa si estás pasando el estado como una prop con el mismo nombre...",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCmxhYW3-O11mLIEe6ysO-wwE1NoQU81hPzf__7eLigJZWsDU_bwGZR4Fz2w0PEU8zUL9kr4KsqSq433yoZ-qJcDTCs13BJQ1GZehurXf_YSyy3YSgUoKyRtfD5LhQpmGFW1T1GBL6fyJ_Y65f9xWaWG8eQ-F7l8493V5DpEy1uAHG2THCW7P1QP5TN7EgqR-_Zw5KtstTg6I2_H2MmTQF3KYz3upKdeLoyffgU9cOZK5Dm2yXteizaipelIcdvrfQ7ne1uu6PuH9sI",
-    },
-  ];
+export default function Comments({postId}) {
+  const [comments, setComments] = useState([])
 
+  useEffect(()=>{
+    const fetchComments = async () =>{
+      try {
+        const response = await getPostComments(postId);
+        setComments(response);
+      } catch (error) {
+        console.error("Failed to fetch comments:", error);
+      }
+    }
+    fetchComments();
+  },[postId])
+  
   return (
     <Box>
       <Typography variant="h5" fontWeight={700} mb={2}>
-        Comentarios ({lista.length})
+        Comentarios ({comments.length})
       </Typography>
-
-      {lista.map((c) => (
+      {comments.length === 0 && (
+        <Typography variant="body1" color="text.secondary" mb={2}>
+          No hay comentarios aún. Sé el primero en comentar.
+        </Typography>
+      )}
+      {comments.map((c) => (
         <Box
           key={c.id}
           sx={{
@@ -49,12 +50,12 @@ export default function Comments() {
           <Avatar src={c.img} sx={{ width: 48, height: 48 }} />
 
           <Box flex={1}>
-            <Typography fontWeight={600}>{c.nombre}</Typography>
+            <Typography fontWeight={600}>{c.user_name}</Typography>
             <Typography variant="body2" color="text.secondary" mb={1}>
-              {c.tiempo}
+              {c.created_at}
             </Typography>
 
-            <Typography mb={2}>{c.comentario}</Typography>
+            <Typography mb={2}>{c.content}</Typography>
 
             <Button
               size="small"
