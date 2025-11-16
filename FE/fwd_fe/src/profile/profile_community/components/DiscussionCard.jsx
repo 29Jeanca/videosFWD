@@ -5,27 +5,26 @@ import {
   Typography,
   Stack,
   Chip,
+  Button,
 } from "@mui/material";
 import { Forum, ThumbUp } from "@mui/icons-material";
-import { useRelativeTime } from "../hooks/useRelativeTime"; // <-- agregado
+import { useRelativeTime } from "../hooks/useRelativeTime";
 
-export default function DiscussionCard({ 
-  user, 
-  createdAt,    // <-- antes era time
-  title, 
-  tag, 
-  comments, 
-  likes, 
-  avatar, 
+export default function DiscussionCard({
+  user,
+  createdAt,
+  title,
+  tag,
+  comments,
+  likes,
+  avatar,
   onLike,
-  onClick
+  onClick,
 }) {
-
-  const time = useRelativeTime(createdAt); // <-- calcula "hace 2h", "hace 3 días", etc.
+  const time = useRelativeTime(createdAt);
 
   return (
     <Card
-      onClick={onClick}
       variant="outlined"
       sx={{
         borderRadius: 3,
@@ -36,9 +35,12 @@ export default function DiscussionCard({
       <CardContent>
         <Stack direction="row" spacing={2}>
           <Avatar src={avatar} sx={{ width: 40, height: 40 }} />
-          <Stack flex={1}>
+          <Stack flex={1}  sx={{ cursor: "pointer" }}>
             <Typography variant="subtitle2" fontWeight={600}>
-              {user} <Typography component="span" color="text.secondary">• {time}</Typography>
+              {user}{" "}
+              <Typography component="span" color="text.secondary">
+                - {time}
+              </Typography>
             </Typography>
             <Typography variant="h6" fontWeight={700} sx={{ mt: 0.5 }}>
               {title}
@@ -50,8 +52,8 @@ export default function DiscussionCard({
                 <Typography variant="body2">{comments}</Typography>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <ThumbUp 
-                  fontSize="small" 
+                <ThumbUp
+                  fontSize="small"
                   cursor="pointer"
                   onClick={() => {
                     onLike();
@@ -60,6 +62,9 @@ export default function DiscussionCard({
                 <Typography variant="body2">{likes}</Typography>
               </Stack>
             </Stack>
+            <Button size="small" sx={{ mt: 2, textTransform: 'none' }} onClick={onClick}>
+              Ver Tema Completo
+            </Button>
           </Stack>
         </Stack>
       </CardContent>

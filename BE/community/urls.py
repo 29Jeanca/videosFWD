@@ -5,6 +5,8 @@ from .views import LikeUnlikePostView
 from .views import GetLikesByPostView
 from .views import CreatePostView
 from .views import GetPostByIdView
+from .views import FilterPostByCategoryView
+from .views import FilterPostByTitleView
 urlpatterns = [
     path('create-post/', CreatePostView.as_view(), name='create-post'),
     path('posts/', PostListCreateView.as_view(), name='posts-list'),
@@ -14,4 +16,6 @@ urlpatterns = [
     path('like-unlike-post/<int:post_id>/', LikeUnlikePostView.as_view(), name='like-unlike-post'),
     path('likes-by-post/<int:post_id>/', GetLikesByPostView.as_view(), name='likes-by-post'),
     path('post/<int:post_id>/', GetPostByIdView.as_view(), name='get-post-by-id'),
+    path('posts-by-category/<int:category_id>/', FilterPostByCategoryView.as_view(), name='posts-by-category'),
+    path('posts-by-title/<str:title_query>/', FilterPostByTitleView.as_view(), name='posts-by-title'),
 ]

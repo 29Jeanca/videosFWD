@@ -144,5 +144,20 @@ const newPost = async (postData) => {
   console.log(data);
   return data;
 }
+
+const getPostByCategory = async (categoryId)=>{
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/posts-by-category/${categoryId}/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
   
-export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments,postLikeUnlike,getLikedPosts,newPost, getPostById};
+export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments,postLikeUnlike,getLikedPosts,newPost, getPostById, getPostByCategory};

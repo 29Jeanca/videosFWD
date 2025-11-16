@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Grid, Box, Container, Stack } from "@mui/material";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
@@ -8,7 +9,13 @@ import FeaturedTopics from "../components/FeaturedTopics";
 import UpcomingEvents from "../components/UpcomingEvents";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
-import { getData, getPostComments, getLikedPosts, postLikeUnlike } from "../../services/validate";
+import {
+  getData,
+  getPostComments,
+  getLikedPosts,
+  postLikeUnlike,
+  getPostByCategory,
+} from "../../services/validate";
 import { useNavigate } from "react-router-dom";
 
 export default function CommunityPage() {
@@ -17,60 +24,64 @@ export default function CommunityPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  // const formaterDate = (dateString) => {
-  //   const date = new Date(dateString);
-  //   return date.toLocaleDateString("es-CR", {
-  //     year: "numeric",
-  //     month: "long",
-  //     day: "numeric",
-  //   });
-  // };
+  const fetchData = async () => {
+    try {
+      const posts = await getData();
+      setCreatedPost(posts);
+
+      if (posts.detail === "Authentication credentials were not provided.") {
+        setCreatedPost([]);
+        navigate("/");
+        return;
+      }
+
+      const likesObj = {};
+      for (const p of posts) {
+        const res = await getLikedPosts(p.id);
+        likesObj[p.id] = res.length;
+      }
+      setLikesByPost(likesObj);
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchCommentPost = async () => {
+    try {
+      await getPostComments(1);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const posts = await getData();
-        setCreatedPost(posts);
-
-        if (posts.detail === "Authentication credentials were not provided.") {
-          setCreatedPost([]);
-          navigate('/');
-          return;
-        }
-
-        const likesObj = {};
-        for (const p of posts) {
-          const res = await getLikedPosts(p.id);
-          likesObj[p.id] = res.length;
-        }
-        setLikesByPost(likesObj);
-
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const fetchCommentPost = async () => {
-      try {
-        await getPostComments(1);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchData();
     fetchCommentPost();
-  }, [navigate]);
+  }, []);
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4}}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={8} lg={9}>
-          <Header />
+          <Header reloadTopics={fetchData} />
+
           <SearchBar />
           <TabSelection />
-          <CategoryChips />
+          <CategoryChips
+            valueCategory={async (catId) => {
+              try {
+                setLoading(true);
+                const data = await getPostByCategory(catId);
+                setCreatedPost(data);
+                setLoading(false);
+              } catch (error) {
+                console.error("Error al filtrar por categoría:", error);
+              }
+            }}
+          />
+
           <Stack spacing={2}>
             {createdPost.length === 0 ? (
               <Box mt={4}>No hay discusiones disponibles.</Box>
@@ -89,15 +100,19 @@ export default function CommunityPage() {
                   onLike={async () => {
                     const response = await postLikeUnlike(d.id);
 
-                    if (response && response.detail === "Authentication credentials were not provided.") {
-                      navigate('/');
+                    if (
+                      response &&
+                      response.detail ===
+                        "Authentication credentials were not provided."
+                    ) {
+                      navigate("/");
                       return;
                     }
 
                     const res = await getLikedPosts(d.id);
-                    setLikesByPost(prev => ({
+                    setLikesByPost((prev) => ({
                       ...prev,
-                      [d.id]: res.length
+                      [d.id]: res.length,
                     }));
                   }}
                   avatar="https://lh3.googleusercontent.com/aida-public/AB6AXuDfmNIZwkNvYKkxc5MShpp3-UzVcELEXVFk9ovihIHFsEQ16u52BQyISU8LLcFmp3Glq3Sef-x9ji5alYOG2TkZG4ioDh6VcpbLIEYE9XEHIgxLkV3H7lU08CTmpYMIcMXpupJvZRQSe-lf0oIr7ooA_8Z3vRmhDwDPFUhYREZxRNGR3tQWj6vzJiRunvnM6KTUl7LwTM9nwIMV-OHGEOZPMEA1YIP_h1q68gcmwaDbNUa7MpBTzfr7BZtcwKiCnTqR0j45yNSR6foz"

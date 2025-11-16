@@ -1,28 +1,33 @@
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Button, Stack, Chip } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CategoryChips from "./CategoryChips";
 import { newPost } from "../../services/validate";
 
-export default function CreateTopicModal({ open, onClose }) {
- const [title, setTitle] = useState("");
+export default function CreateTopicModal({ open, onClose, reloadTopics }) {
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState(null); 
+  const [category, setCategory] = useState(null);
 
   const handleCategorySelect = (catId) => {
     setCategory(catId);
   };
 
-  const postTopic = async() =>{
+  const postTopic = async () => {
     const newTopic = {
-        title,
-        content,
-        category,
-    }
+      title,
+      content,
+      category,
+    };
+
     const postedTopic = await newPost(newTopic);
     console.log(postedTopic);
+
     onClose();
-  }
+
+    // 🔥 5. Recargar automáticamente los posts
+    if (reloadTopics) reloadTopics();
+  };
 
   return (
     <Dialog
@@ -37,7 +42,6 @@ export default function CreateTopicModal({ open, onClose }) {
         },
       }}
     >
-      {/* Header */}
       <DialogTitle
         sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
@@ -48,7 +52,6 @@ export default function CreateTopicModal({ open, onClose }) {
       </DialogTitle>
 
       <DialogContent>
-
         <CategoryChips
           clickedCategory={category}
           valueCategory={handleCategorySelect}
@@ -80,7 +83,6 @@ export default function CreateTopicModal({ open, onClose }) {
           variant="contained"
           disabled={!title.trim() || !content.trim() || !category}
           onClick={postTopic}
-          
         >
           Publicar Tema
         </Button>

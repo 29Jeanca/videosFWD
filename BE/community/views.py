@@ -65,8 +65,8 @@ class CommentPostListCreateView(ListCreateAPIView):
     serializer_class = CommentPostSerializer
 
 class CommentByPostView(ListCreateAPIView):
-    # authentication_classes = [CookieJWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     serializer_class = CommentPostSerializer
 
@@ -102,4 +102,20 @@ class GetLikesByPostView(APIView):
         return Response(serializer.data)
 
 
-   
+class FilterPostByCategoryView(ListCreateAPIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        return Post.objects.filter(category_id=category_id).order_by('-created_at')
+    
+class FilterPostByTitleView(ListCreateAPIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        title = self.kwargs['title_query']
+        return Post.objects.filter(title__icontains=title).order_by('-created_at')

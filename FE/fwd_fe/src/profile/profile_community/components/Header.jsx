@@ -2,13 +2,13 @@ import { Box, Typography, Button, Stack } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useState } from "react";
 import CreateTopicModal from "./CreateTopicModal";
-export default function Header() {
-  const [openModal,setOpenModal] = useState(false);
 
-  const handleOpenModal = () =>{
+export default function Header({ reloadTopics }) {
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => {
     setOpenModal(true);
-  }
-
+  };
 
   return (
     <Stack
@@ -37,7 +37,13 @@ export default function Header() {
           Crear Nuevo Tema
         </Button>
       </Stack>
-      <CreateTopicModal open={openModal} onClose={() => setOpenModal(false)} />
+
+      {/* 🔥 4. Pasar reloadTopics al modal */}
+      <CreateTopicModal 
+        open={openModal} 
+        onClose={() => setOpenModal(false)} 
+        reloadTopics={reloadTopics} 
+      />
     </Stack>
   );
 }
