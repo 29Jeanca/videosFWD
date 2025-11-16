@@ -12,10 +12,14 @@ export default function TabsSection() {
         onChange={handleChange}
         textColor="primary"
         indicatorColor="primary"
-      >
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+>
         <Tab label="Recientes" sx={{ fontWeight: "bold" }} />
         <Tab label="Más Activos" sx={{ fontWeight: "bold" }} />
         <Tab label="Sin Responder" sx={{ fontWeight: "bold" }} />
+        <Tab label="Más Gustados" sx={{ fontWeight: "bold" }} />
       </Tabs>
     </Box>
   );

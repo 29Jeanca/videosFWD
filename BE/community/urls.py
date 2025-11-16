@@ -7,6 +7,9 @@ from .views import CreatePostView
 from .views import GetPostByIdView
 from .views import FilterPostByCategoryView
 from .views import FilterPostByTitleView
+from .views import RecentPostListView
+from .views import MostLikedPostListView
+
 urlpatterns = [
     path('create-post/', CreatePostView.as_view(), name='create-post'),
     path('posts/', PostListCreateView.as_view(), name='posts-list'),
@@ -18,4 +21,6 @@ urlpatterns = [
     path('post/<int:post_id>/', GetPostByIdView.as_view(), name='get-post-by-id'),
     path('posts-by-category/<int:category_id>/', FilterPostByCategoryView.as_view(), name='posts-by-category'),
     path('posts-by-title/<str:title_query>/', FilterPostByTitleView.as_view(), name='posts-by-title'),
+    path('posts-most-liked/', MostLikedPostListView.as_view(), name='posts-most-liked'),
+    path('recent-posts/', RecentPostListView.as_view(), name='recent-posts'),
 ]

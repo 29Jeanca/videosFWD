@@ -3,11 +3,14 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextFiel
 import CloseIcon from "@mui/icons-material/Close";
 import CategoryChips from "./CategoryChips";
 import { newPost } from "../../services/validate";
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function CreateTopicModal({ open, onClose, reloadTopics }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState(null);
+  const [anonymous, setAnonymous] = useState(false);
 
   const handleCategorySelect = (catId) => {
     setCategory(catId);
@@ -18,6 +21,7 @@ export default function CreateTopicModal({ open, onClose, reloadTopics }) {
       title,
       content,
       category,
+      anonymous,
     };
 
     const postedTopic = await newPost(newTopic);
@@ -25,7 +29,7 @@ export default function CreateTopicModal({ open, onClose, reloadTopics }) {
 
     onClose();
 
-    // 🔥 5. Recargar automáticamente los posts
+    
     if (reloadTopics) reloadTopics();
   };
 
@@ -74,8 +78,10 @@ export default function CreateTopicModal({ open, onClose, reloadTopics }) {
           onChange={(e) => setContent(e.target.value)}
           margin="normal"
         />
+      
+      <FormControlLabel control={<Checkbox checked={anonymous} onChange={(e) => setAnonymous(e.target.checked)} />} label="Anónimo" />
       </DialogContent>
-
+      
       <DialogActions>
         <Button onClick={onClose} variant="outlined">Cancelar</Button>
 

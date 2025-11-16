@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Box, Container, Stack } from "@mui/material";
+import { Grid, Box, Container, Stack, Chip } from "@mui/material";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import TabSelection from "../components/TabSelection";
@@ -64,62 +64,79 @@ export default function CommunityPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Grid container spacing={4}>
-        <Grid item xs={12} md={8} lg={9}>
+        
+        {/* ---- CONTENIDO PRINCIPAL: ahora ocupa TODAS las columnas ---- */}
+        <Grid item xs={12}>
           <Header reloadTopics={fetchData} />
 
           <SearchBar />
           <TabSelection />
-          <CategoryChips
-            valueCategory={async (catId) => {
-              try {
-                setLoading(true);
-                const data = await getPostByCategory(catId);
-                setCreatedPost(data);
-                setLoading(false);
-              } catch (error) {
-                console.error("Error al filtrar por categoría:", error);
-              }
-            }}
-          />
 
-          <Stack spacing={2}>
+          {/* Chips de categorías */}
+          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+            <Chip label="Todas" onClick={fetchData} />
+            <CategoryChips
+              valueCategory={async (catId) => {
+                try {
+                  setLoading(true);
+                  const data = await getPostByCategory(catId);
+                  setCreatedPost(data);
+                  setLoading(false);
+                } catch (error) {
+                  console.error("Error al filtrar por categoría:", error);
+                }
+              }}
+            />
+          </Stack>
+
+          {/* ---- TARJETAS DE DISCUSIÓN ---- */}
+          <Grid container spacing={2} sx={{ mt: 1 }}>
             {createdPost.length === 0 ? (
               <Box mt={4}>No hay discusiones disponibles.</Box>
             ) : loading ? (
               <Box mt={4}>Cargando discusiones...</Box>
             ) : (
               createdPost.map((d, i) => (
-                <DiscussionCard
-                  onClick={() => navigate(`/post/${d.id}`)}
+                <Grid
+                  item
                   key={i}
-                  user={d.user_name}
-                  createdAt={d.created_at}
-                  title={d.title}
-                  tag={d.category_name}
-                  likes={likesByPost[d.id] ?? 0}
-                  onLike={async () => {
-                    const response = await postLikeUnlike(d.id);
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                  xl={2}
+                >
+                  <DiscussionCard
+                    onClick={() => navigate(`/post/${d.id}`)}
+                    user={d.anonymous ? "Participante Anónimo" : d.user_name}
+                    createdAt={d.created_at}
+                    title={d.title}
+                    tag={d.category_name}
+                    likes={likesByPost[d.id] ?? 0}
+                    onLike={async () => {
+                      const response = await postLikeUnlike(d.id);
 
-                    if (
-                      response &&
-                      response.detail ===
-                        "Authentication credentials were not provided."
-                    ) {
-                      navigate("/");
-                      return;
-                    }
+                      if (
+                        response &&
+                        response.detail ===
+                          "Authentication credentials were not provided."
+                      ) {
+                        navigate("/");
+                        return;
+                      }
 
-                    const res = await getLikedPosts(d.id);
-                    setLikesByPost((prev) => ({
-                      ...prev,
-                      [d.id]: res.length,
-                    }));
-                  }}
-                  avatar="https://lh3.googleusercontent.com/aida-public/AB6AXuDfmNIZwkNvYKkxc5MShpp3-UzVcELEXVFk9ovihIHFsEQ16u52BQyISU8LLcFmp3Glq3Sef-x9ji5alYOG2TkZG4ioDh6VcpbLIEYE9XEHIgxLkV3H7lU08CTmpYMIcMXpupJvZRQSe-lf0oIr7ooA_8Z3vRmhDwDPFUhYREZxRNGR3tQWj6vzJiRunvnM6KTUl7LwTM9nwIMV-OHGEOZPMEA1YIP_h1q68gcmwaDbNUa7MpBTzfr7BZtcwKiCnTqR0j45yNSR6foz"
-                />
+                      const res = await getLikedPosts(d.id);
+                      setLikesByPost((prev) => ({
+                        ...prev,
+                        [d.id]: res.length,
+                      }));
+                    }}
+                    avatar="https://lh3.googleusercontent.com/aida-public/AB6AXuDfmNIZwkNvYKkxc5MShpp3-UzVcELEXVFk9ovihIHFsEQ16u52BQyISU8LLcFmp3Glq3Sef-x9ji5alYOG2TkZG4ioDh6VcpbLIEYE9XEHIgxLkV3H7lU08CTmpYMIcMXpupJvZRQSe-lf0oIr7ooA_8Z3vRmhDwDPFUhYREZxRNGR3tQWj6vzJiRunvnM6KTUl7LwTM9nwIMV-OHGEOZPMEA1YIP_h1q68gcmwaDbNUa7MpBTzfr7BZtcwKiCnTqR0j45yNSR6foz"
+                  />
+                </Grid>
               ))
             )}
-          </Stack>
+          </Grid>
         </Grid>
       </Grid>
     </Container>

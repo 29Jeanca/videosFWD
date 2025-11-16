@@ -1,56 +1,82 @@
-import { Stack, Chip } from "@mui/material";
+import { Tabs, Tab, Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getCategories } from "../../services/validate";
+
 export default function CategoryChips({ clickedCategory, valueCategory }) {
   const [categories, setCategories] = useState([]);
+  const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
         setCategories(response);
+
+        const initialIndex = response.findIndex(
+          (cat) => cat.id === clickedCategory
+        );
+        if (initialIndex !== -1) setTabValue(initialIndex);
       } catch (error) {
-        console.error("Error al obtener las categorias:", error);
+        console.error("Error al obtener categorías:", error);
       }
     };
     fetchCategories();
-  }, []);
+  }, [clickedCategory]);
+
+  const handleChange = (_, newValue) => {
+    setTabValue(newValue);
+    const selected = categories[newValue];
+    if (selected) valueCategory(selected.id);
+  };
 
   return (
-    <Stack
-      direction="row"
-      spacing={1.5}
-      sx={{
-        overflowX: "auto",
-        pb: 1,
-        mb: 3,
-        "&::-webkit-scrollbar": { display: "none" },
-      }}
-    >
-      {categories.length === 0 && (
-        <Chip
-          label="No hay categorías disponibles"
-          sx={{
-            bgcolor: "action.hover",
-            fontWeight: 500,
-          }}
-        />
-      )}
+    <Box sx={{ width: "100%", mb: 3 }}>
+      <Tabs
+        value={tabValue}
+        onChange={handleChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        TabIndicatorProps={{ style: { display: "none" } }}
+        sx={{
+          width: "100%",
+          maxWidth: "80%",
 
-      {categories.map((cat) => (
-        <Chip
-          key={cat.id}
-          label={cat.name}
-          onClick={() => valueCategory(cat.id)}
-          sx={{
-            bgcolor: clickedCategory === cat.id ? "primary.main" : "action.hover",
-            color: clickedCategory === cat.id ? "white" : "text.primary",
+          "& .MuiTabs-flexContainer": {
+            gap: 1.2,
+          },
+
+          "& .MuiTab-root": {
+            textTransform: "none",
             fontWeight: 600,
-          }}
-          clickable
-        />
-      ))}
-    </Stack>
+            minHeight: "36px",
+            borderRadius: "18px",
+            padding: "6px 14px",
+            minWidth: "auto",
+            backgroundColor: "action.hover",
+            color: "text.primary",
+
+            "&:hover": {
+              backgroundColor: "action.selected",
+            },
+          },
+
+          // ⭐ Seleccionado = color #414071
+          "& .Mui-selected": {
+            backgroundColor: "#414071 !important",
+            color: "white !important",
+          },
+
+          "& .MuiTabs-scrollButtons": {
+            width: "32px",
+            borderRadius: "50%",
+          },
+        }}
+      >
+        {categories.map((cat) => (
+          <Tab key={cat.id} label={cat.name} />
+        ))}
+      </Tabs>
+    </Box>
   );
 }
-

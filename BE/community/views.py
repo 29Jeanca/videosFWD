@@ -12,8 +12,38 @@ class PostListCreateView(ListCreateAPIView):
     method = 'GET'
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
+    queryset = Post.objects.all()
+    # queryset = Post.objects.all().order_by('-created_at') sirve para los mas recientes
+    serializer_class = PostSerializer
+
+class RecentPostListView(ListCreateAPIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
+
+class MostLikedPostListView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        posts = Post.objects.all()
+        posts_with_likes = []
+
+        for post in posts:
+            like_count = LikePost.objects.filter(post=post).count()
+            posts_with_likes.append((post, like_count))
+
+        # Ordenar los posts por el número de likes en orden descendente
+        posts_with_likes.sort(key=lambda x: x[1], reverse=True)
+
+        # Extraer solo los posts ordenados
+        sorted_posts = [post for post, count in posts_with_likes]
+
+        serializer = PostSerializer(sorted_posts, many=True)
+        return Response(serializer.data)
+    
+    
 
 class GetPostByIdView(APIView):
     authentication_classes = [CookieJWTAuthentication]

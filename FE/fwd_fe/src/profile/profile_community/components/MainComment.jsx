@@ -3,13 +3,24 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { useEffect, useState } from "react";
 import { getPostById } from "../../services/validate";
+import { postLikeUnlike } from "../../services/validate";
+import { getLikedPosts } from "../../services/validate";
+import { useNavigate } from "react-router-dom";
 
 export default function MainComment({ postId }) {
   const [contentPost, setContentPost] = useState([]);
+  const [likesByPost, setLikesByPost] = useState({});
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchPostDetails = async () => {
       try {
         const data = await getPostById(postId);
+        if(data.detail === "Authentication credentials were not provided."){
+          navigate("/");
+          return;
+        }
         console.log(data);
         setContentPost(data);
       } catch (error) {
@@ -44,7 +55,7 @@ export default function MainComment({ postId }) {
           sx={{ width: 56, height: 56 }}
         />
         <Box>
-          <Typography fontWeight={600}>{contentPost.user_name}</Typography>
+          <Typography fontWeight={600}>{contentPost.anonymous ? 'Participante Anónimo' : contentPost.user_name}</Typography>
           <Typography variant="body2" color="text.secondary">
             {formaterDate(contentPost.created_at)}
           </Typography>
@@ -61,8 +72,29 @@ export default function MainComment({ postId }) {
         <Chip label={contentPost.category_name} />
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <ThumbUpIcon fontSize="small" cursor="pointer" />
-          <Typography>{1}</Typography>
+          <ThumbUpIcon fontSize="small" cursor="pointer" onClick={async()=>{
+                    const response = await postLikeUnlike(contentPost.id);
+                    console.log('Me tocaste');
+                    
+                    if (
+                      response &&
+                      response.detail ===
+                        "Authentication credentials were not provided."
+                    ) {
+                      navigate("/");
+                      return;
+                    }
+
+                    const res = await getLikedPosts(contentPost.id);
+                    setLikesByPost((prev) => ({
+                      ...prev,
+                      [contentPost.id]: res.length,
+                    }));
+                    console.log(res);
+            }
+          } 
+           />
+          <Typography>{likesByPost[contentPost.id] || 0}</Typography>
         </Box>
 
         {/* <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
