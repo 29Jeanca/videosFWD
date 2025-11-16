@@ -159,5 +159,22 @@ const getPostByCategory = async (categoryId)=>{
   console.log(data);
   return data;
 }
+const postNewComment = async(commentData)=>{
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/comment-post/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+    body: JSON.stringify(commentData),
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+
+}
+
   
-export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments,postLikeUnlike,getLikedPosts,newPost, getPostById, getPostByCategory};
+export {getUserProfile, patchUserProfile,getData,getCategories,getPostComments,postLikeUnlike,getLikedPosts,newPost, getPostById, getPostByCategory, postNewComment};

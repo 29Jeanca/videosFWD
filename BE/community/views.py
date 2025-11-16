@@ -94,6 +94,28 @@ class CommentPostListCreateView(ListCreateAPIView):
     queryset = CommentPost.objects.all().order_by('-created_at')
     serializer_class = CommentPostSerializer
 
+
+class CommentPostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request):
+        user = request.user
+        post_id = request.data.get('post_id')
+        content = request.data.get('content')
+
+        if not post_id or not content:
+            return Response({"error":"Faltan campos obligatorios"},status=400)
+        
+        comment = CommentPost.objects.create(
+            user=user,
+            post_id=post_id,
+            content=content
+        )
+        serializer = CommentPostSerializer(comment)
+        comment.save()
+        return Response(serializer.data, status=201)
+
 class CommentByPostView(ListCreateAPIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]

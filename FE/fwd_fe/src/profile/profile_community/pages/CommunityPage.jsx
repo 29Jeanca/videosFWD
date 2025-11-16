@@ -65,14 +65,12 @@ export default function CommunityPage() {
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Grid container spacing={4}>
         
-        {/* ---- CONTENIDO PRINCIPAL: ahora ocupa TODAS las columnas ---- */}
         <Grid item xs={12}>
           <Header reloadTopics={fetchData} />
 
           <SearchBar />
           <TabSelection />
 
-          {/* Chips de categorías */}
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <Chip label="Todas" onClick={fetchData} />
             <CategoryChips
@@ -89,7 +87,6 @@ export default function CommunityPage() {
             />
           </Stack>
 
-          {/* ---- TARJETAS DE DISCUSIÓN ---- */}
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {createdPost.length === 0 ? (
               <Box mt={4}>No hay discusiones disponibles.</Box>
@@ -100,7 +97,7 @@ export default function CommunityPage() {
                 <Grid
                   item
                   key={i}
-                  xs={12}
+                  xs={11}
                   sm={6}
                   md={4}
                   lg={3}
