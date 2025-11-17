@@ -2,19 +2,32 @@ import { Box, Avatar, TextField, Button, Typography } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { postNewComment } from "../../services/validate";
-export default function NewComment() {
-  const {postId} = useParams();
+
+export default function NewComment({ onCommentAdded }) {
+  const { postId } = useParams();
   const [content, setContent] = useState("");
 
-  const postComment = async() =>{
+  const postComment = async () => {
+    if (!content.trim()) return;
+
     const objComment = {
       post_id: postId,
-      content: content
+      content: content,
+    };
+
+    try {
+      const response = await postNewComment(objComment);
+      console.log(response);
+
+      setContent("");
+
+      // Notifica al padre que debe recargar comentarios
+      onCommentAdded();
+    } catch (err) {
+      console.error("Error al publicar comentario:", err);
     }
-    const response = await postNewComment(objComment);
-    console.log(response);
-    setContent("");
-  }
+  };
+
   return (
     <Box sx={{ mt: 5 }}>
       <Typography variant="h6" fontWeight={700} mb={2}>
@@ -44,9 +57,12 @@ export default function NewComment() {
           />
 
           <Box sx={{ mt: 2, textAlign: "right" }}>
-            <Button 
-            onClick={postComment}
-            variant="contained">Publicar Comentario</Button>
+            <Button
+              onClick={postComment}
+              variant="contained"
+            >
+              Publicar Comentario
+            </Button>
           </Box>
         </Box>
       </Box>

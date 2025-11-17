@@ -17,6 +17,10 @@ export default function MainComment({ postId }) {
           navigate("/");
           return;
         }
+        if (data.error === "Post no encontrado") {
+          navigate("*");
+          return;
+        }
         setContentPost(data);
       } catch (error) {
         console.error(error);

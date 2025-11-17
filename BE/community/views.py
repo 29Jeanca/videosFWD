@@ -15,6 +15,7 @@ class PostListCreateView(ListCreateAPIView):
     queryset = Post.objects.all()
     # queryset = Post.objects.all().order_by('-created_at') sirve para los mas recientes
     serializer_class = PostSerializer
+    
 
 class RecentPostListView(ListCreateAPIView):
     authentication_classes = [CookieJWTAuthentication]
@@ -50,10 +51,12 @@ class GetPostByIdView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self,request,post_id):
-        post = Post.objects.get(id=post_id)
-        serializer = PostSerializer(post)
-        
-        return Response(serializer.data)
+        try:
+            post = Post.objects.get(id=post_id)
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+        except Post.DoesNotExist:
+            return Response({"error":"Post no encontrado"},status=404)
 
 class CreatePostView(APIView):
     authentication_classes = [CookieJWTAuthentication]
@@ -123,8 +126,12 @@ class CommentByPostView(ListCreateAPIView):
     serializer_class = CommentPostSerializer
 
     def get_queryset(self):
-        post_id = self.kwargs['post_id']
-        return CommentPost.objects.filter(post_id=post_id)
+        try:
+            post_id = self.kwargs['post_id']
+            return CommentPost.objects.filter(post_id=post_id)
+        except CommentPost.DoesNotExist:
+            return Response({"error":"Post no encontrado"},status=404)
+    
 
 class LikeUnlikePostView(APIView):
     authentication_classes = [CookieJWTAuthentication]
