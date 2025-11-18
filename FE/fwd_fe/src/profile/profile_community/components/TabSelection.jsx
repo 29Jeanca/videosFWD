@@ -1,9 +1,13 @@
 import { Tabs, Tab, Box } from "@mui/material";
 import { useState } from "react";
 
-export default function TabsSection() {
+export default function TabSelection({ onTabChange }) {
   const [value, setValue] = useState(0);
-  const handleChange = (_, newValue) => setValue(newValue);
+
+  const handleChange = (_, newValue) => {
+    setValue(newValue);
+    onTabChange(newValue);  // 👈 aquí notificamos al padre qué tab tocó
+  };
 
   return (
     <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
@@ -15,7 +19,7 @@ export default function TabsSection() {
         variant="scrollable"
         scrollButtons="auto"
         allowScrollButtonsMobile
->
+      >
         <Tab label="Recientes" sx={{ fontWeight: "bold" }} />
         <Tab label="Más Activos" sx={{ fontWeight: "bold" }} />
         <Tab label="Sin Responder" sx={{ fontWeight: "bold" }} />

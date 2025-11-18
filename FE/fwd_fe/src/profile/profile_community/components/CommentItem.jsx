@@ -29,17 +29,7 @@ export default function CommentItem({ comment }) {
 
         <Typography mb={2}>{comment.content}</Typography>
 
-        <Button
-          size="small"
-          startIcon={<ReplyIcon fontSize="small" />}
-          sx={{
-            bgcolor: "grey.200",
-            color: "text.primary",
-            textTransform: "none",
-          }}
-        >
-          Responder
-        </Button>
+        
       </Box>
     </Box>
   );

@@ -5,9 +5,6 @@ import SearchBar from "../components/SearchBar";
 import TabSelection from "../components/TabSelection";
 import CategoryChips from "../components/CategoryChips";
 import DiscussionCard from "../components/DiscussionCard";
-import FeaturedTopics from "../components/FeaturedTopics";
-import UpcomingEvents from "../components/UpcomingEvents";
-import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import {
   getData,
@@ -20,27 +17,45 @@ import { useNavigate } from "react-router-dom";
 
 export default function CommunityPage() {
   const [createdPost, setCreatedPost] = useState([]);
+  const [originalPosts, setOriginalPosts] = useState([]);
+
   const [likesByPost, setLikesByPost] = useState({});
+  const [commentsByPost, setCommentsByPost] = useState({});
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
+  // -------------------------------
+  // Fetch principal de todos los posts
+  // -------------------------------
   const fetchData = async () => {
     try {
       const posts = await getData();
-      setCreatedPost(posts);
 
       if (posts.detail === "Authentication credentials were not provided.") {
-        setCreatedPost([]);
         navigate("/");
         return;
       }
 
+      setCreatedPost(posts);
+      setOriginalPosts(posts);
+
+      // likes
       const likesObj = {};
       for (const p of posts) {
         const res = await getLikedPosts(p.id);
         likesObj[p.id] = res.length;
       }
+
+      // comentarios
+      const commentsObj = {};
+      for (const p of posts) {
+        const res = await getPostComments(p.id);
+        commentsObj[p.id] = res.length;
+      }
+
       setLikesByPost(likesObj);
+      setCommentsByPost(commentsObj);
 
       setLoading(false);
     } catch (error) {
@@ -61,16 +76,67 @@ export default function CommunityPage() {
     fetchCommentPost();
   }, []);
 
+  // -------------------------------
+  // Filtrado por Tabs
+  // -------------------------------
+  const handleTabFilter = (tabIndex) => {
+    let sorted = [...originalPosts];
+
+    switch (tabIndex) {
+      case 0:
+        // Recientes
+        sorted.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        break;
+
+      case 1:
+        // Más Activos (más comentarios)
+        sorted.sort(
+          (a, b) =>
+            (commentsByPost[b.id] ?? 0) -
+            (commentsByPost[a.id] ?? 0)
+        );
+        break;
+
+      case 2:
+        // Sin Responder
+        sorted = sorted.filter(
+          (p) => (commentsByPost[p.id] ?? 0) === 0
+        );
+        break;
+
+      case 3:
+        // Más Gustados
+        sorted.sort(
+          (a, b) =>
+            (likesByPost[b.id] ?? 0) -
+            (likesByPost[a.id] ?? 0)
+        );
+        break;
+
+      default:
+        break;
+    }
+
+    setCreatedPost(sorted);
+  };
+
+  // -------------------------------
+  // Render principal
+  // -------------------------------
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Grid container spacing={4}>
-        
         <Grid item xs={12}>
           <Header reloadTopics={fetchData} />
 
           <SearchBar />
-          <TabSelection />
 
+          {/* TABS QUE CAMBIAN LA VISTA */}
+          <TabSelection onTabChange={handleTabFilter} />
+
+          {/* CATEGORÍAS */}
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <Chip label="Todas" onClick={fetchData} />
             <CategoryChips
@@ -79,6 +145,7 @@ export default function CommunityPage() {
                   setLoading(true);
                   const data = await getPostByCategory(catId);
                   setCreatedPost(data);
+                  setOriginalPosts(data);
                   setLoading(false);
                 } catch (error) {
                   console.error("Error al filtrar por categoría:", error);
@@ -87,6 +154,7 @@ export default function CommunityPage() {
             />
           </Stack>
 
+          {/* LISTA DE POSTS */}
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {createdPost.length === 0 ? (
               <Box mt={4}>No hay discusiones disponibles.</Box>
@@ -105,11 +173,16 @@ export default function CommunityPage() {
                 >
                   <DiscussionCard
                     onClick={() => navigate(`/post/${d.id}`)}
-                    user={d.anonymous ? "Participante Anónimo" : d.user_name}
+                    user={
+                      d.anonymous
+                        ? "Participante Anónimo"
+                        : d.user_name
+                    }
                     createdAt={d.created_at}
                     title={d.title}
                     tag={d.category_name}
                     likes={likesByPost[d.id] ?? 0}
+                    comments={commentsByPost[d.id] ?? 0}
                     onLike={async () => {
                       const response = await postLikeUnlike(d.id);
 

@@ -27,7 +27,7 @@ export default function PostPage() {
           flexShrink: 0,
         }}
       >
-        <Sidebar communityActive={true} profileActive={false} />
+        <Sidebar communityActive={true} profileActive={false} profile={()=>{navigate('/perfil')}} />
       </Box>
 
       <Button

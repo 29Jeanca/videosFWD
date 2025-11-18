@@ -13,6 +13,7 @@ export default function MainComment({ postId }) {
     const fetchPostDetails = async () => {
       try {
         const data = await getPostById(postId);
+
         if (data.detail === "Authentication credentials were not provided.") {
           navigate("/");
           return;
@@ -21,11 +22,20 @@ export default function MainComment({ postId }) {
           navigate("*");
           return;
         }
+
         setContentPost(data);
+
+        // 👉 Cargar los likes del post
+        const likes = await getLikedPosts(data.id);
+        setLikesByPost((prev) => ({
+          ...prev,
+          [data.id]: likes.length,
+        }));
       } catch (error) {
         console.error(error);
       }
     };
+
     fetchPostDetails();
   }, [postId]);
 
@@ -48,7 +58,6 @@ export default function MainComment({ postId }) {
         bgcolor: "background.paper",
       }}
     >
-      {/* Header usuario */}
       <Box
         sx={{
           display: "flex",
@@ -72,7 +81,6 @@ export default function MainComment({ postId }) {
         </Box>
       </Box>
 
-      {/* Título */}
       <Typography
         variant="h4"
         fontWeight={700}
@@ -84,7 +92,6 @@ export default function MainComment({ postId }) {
 
       <Typography mb={2}>{contentPost.content}</Typography>
 
-      {/* Pie con chips y like */}
       <Box
         sx={{
           display: "flex",
@@ -95,6 +102,7 @@ export default function MainComment({ postId }) {
       >
         <Chip label={contentPost.category_name} />
 
+        {/* ❤️ Likes */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <ThumbUpIcon
             fontSize="small"
@@ -107,6 +115,7 @@ export default function MainComment({ postId }) {
                 return;
               }
 
+              // 👉 Recalcular likes tras darle click
               const res = await getLikedPosts(contentPost.id);
               setLikesByPost((prev) => ({
                 ...prev,
@@ -114,7 +123,7 @@ export default function MainComment({ postId }) {
               }));
             }}
           />
-          <Typography>{likesByPost[contentPost.id] || 0}</Typography>
+          <Typography>{likesByPost[contentPost.id] ?? 0}</Typography>
         </Box>
       </Box>
     </Box>

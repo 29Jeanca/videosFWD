@@ -18,7 +18,7 @@ export default function Comments({ postId, reload }) {
 
   useEffect(() => {
     fetchComments();
-  }, [postId, reload]);  // ⬅️ recarga cuando se agrega un comentario
+  }, [postId, reload]);  
 
   return (
     <Box>
