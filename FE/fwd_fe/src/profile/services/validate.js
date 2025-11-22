@@ -122,6 +122,38 @@ const getPostByCategory = async (categoryId) => {
   return data;
 };
 
+const editPost = async (postId, postData) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/edit-post/${postId}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+    body: JSON.stringify(postData),
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+};
+
+const deletePost = async (postId) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/delete-post/${postId}/`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+};
+
+
 
 // ===============================
 // CATEGORIES
@@ -257,5 +289,7 @@ export {
   getPostById,
   getPostByCategory,
   postNewComment,
-  getInfoByFilter
+  getInfoByFilter,
+  editPost,
+  deletePost,
 };

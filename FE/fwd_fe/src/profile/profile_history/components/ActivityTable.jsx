@@ -12,10 +12,18 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
+import { useState } from "react";
+import EditTopicModal from "./EditTopicModal";
+import DeleteModal from "./DeleteModal";
+import { Delete } from "@mui/icons-material";
+import { deletePost } from "../../services/validate";
+export default function ActivityTable({ info, showEdit, reloadInfo }) {
+  const [showModalPost, setShowModalPost] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-
-export default function ActivityTable({info,showEdit}) {
-    const formaterDate = (dateString) => {
+  const formaterDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CR", {
       year: "numeric",
@@ -23,6 +31,12 @@ export default function ActivityTable({info,showEdit}) {
       day: "numeric",
     });
   };
+  const deleteInfo = async (id) => {
+    const response = await deletePost(id);
+    console.log(response);
+    return response;
+  };
+
   return (
     <>
       <Box
@@ -44,17 +58,17 @@ export default function ActivityTable({info,showEdit}) {
               <TableCell />
             </TableRow>
           </TableHead>
-            {info.length === 0 && (
-              <TableBody>
-                <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            No hay actividad reciente.
-                        </Typography>
-                    </TableCell>
-                </TableRow>
-                </TableBody>
-            )}
+          {info.length === 0 && (
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    No hay actividad reciente.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          )}
           <TableBody>
             {info.map((row) => (
               <TableRow
@@ -84,10 +98,13 @@ export default function ActivityTable({info,showEdit}) {
                     <Box>
                       <Typography fontWeight={600}>{row.title}</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {row.category_name ? `Publicado en la categoría de ${row.category_name}` :
-                        row.post_comment ? `Comentario en el post: ${row.post_comment}` :
-                        row.post_title ? `Like en el post: ${row.post_title}` :
-                        ''}
+                        {row.category_name
+                          ? `Publicado en la categoría de ${row.category_name}`
+                          : row.post_comment
+                          ? `Comentario en el post: ${row.post_comment}`
+                          : row.post_title
+                          ? `Like en el post: ${row.post_title}`
+                          : ""}
                       </Typography>
                     </Box>
                   </Box>
@@ -101,10 +118,25 @@ export default function ActivityTable({info,showEdit}) {
 
                 <TableCell align="right">
                   <IconButton>
-                    {showEdit && <EditIcon fontSize="small" />}
+                    {showEdit && (
+                      <EditIcon
+                        onClick={() => {
+                          setShowModalPost(true);
+                          setSelectedTopic(row);
+                        }}
+                        fontSize="small"
+                      />
+                    )}
                   </IconButton>
                   <IconButton>
-                    <DeleteIcon fontSize="small" />
+                    <Delete
+                      fontSize="small"
+                      onClick={() => {
+                        setShowDeleteModal(true);
+                        setSelectedTopic(row);
+                        reloadInfo();
+                      }}
+                    />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -124,19 +156,35 @@ export default function ActivityTable({info,showEdit}) {
         <Typography variant="body2" color="text.secondary">
           {/* Mostrando <b>1</b> a <b>4</b> de <b>12</b> resultados */}
         </Typography>
-
+        {showDeleteModal && (
+          <DeleteModal
+            open={showDeleteModal}
+            onCancel={() => setShowDeleteModal(false)}
+            onConfirm={() => {
+              setShowDeleteModal(false);
+              setConfirmDelete(true);
+              deleteInfo(selectedTopic.id).then(() => {
+                reloadInfo();
+              });
+            }}
+          />
+        )}
+        {showModalPost && (
+          <EditTopicModal
+            open={showModalPost}
+            onClose={() => {
+              setShowModalPost(false);
+              reloadInfo();
+            }}
+            existingTopic={selectedTopic}
+          />
+        )}
         <Box display="flex" gap={1}>
-          <Box
-          >
-            <Button variant="outlined" >
-            Anterior
-            </Button>
+          <Box>
+            <Button variant="outlined">Anterior</Button>
           </Box>
-          <Box
-          >
-            <Button variant="outlined" >
-            Siguiente
-            </Button>
+          <Box>
+            <Button variant="outlined">Siguiente</Button>
           </Box>
         </Box>
       </Box>

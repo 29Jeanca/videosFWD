@@ -253,4 +253,51 @@ class FilterLikeByUserView(APIView):
         serializer = LikePostSerializer(likes, many=True)
         
         return Response(serializer.data)
-       
+
+
+# ============================
+# EDITAR Y BORRAR POSTS
+# ============================
+class EditPostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, post_id):
+        user = request.user
+        try:
+            post = Post.objects.get(id=post_id, user=user)
+        except Post.DoesNotExist:
+            return Response({"error": "Post no encontrado o no autorizado"}, status=404)
+
+        title = request.data.get('title')
+        content = request.data.get('content')
+        category_id = request.data.get('category')
+        anonymous = request.data.get('anonymous', post.anonymous)
+
+        if title:
+            post.title = title
+        if content:
+            post.content = content
+        if category_id:
+            post.category_id = category_id
+        post.anonymous = anonymous
+        post.save()
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+class DeletePostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, post_id):
+        user = request.user
+        try:
+            post = Post.objects.get(id=post_id, user=user)
+        except Post.DoesNotExist:
+            return Response(
+                {"error": "Post no encontrado o no autorizado"},
+                status=404
+            )
+
+        post.delete()
+        return Response({"message": "Post eliminado correctamente"})

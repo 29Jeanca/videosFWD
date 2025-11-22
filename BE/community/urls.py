@@ -9,6 +9,8 @@ from .views import (
     FilterPostByCategoryView,
     FilterPostByTitleView,
     FilterPostByUserView,
+    EditPostView,
+    DeletePostView,
 
     # CATEGORÍAS
     CategoryPostListCreateView,
@@ -38,6 +40,8 @@ urlpatterns = [
     path('posts-by-category/<int:category_id>/', FilterPostByCategoryView.as_view(), name='posts-by-category'),
     path('posts-by-title/<str:title_query>/', FilterPostByTitleView.as_view(), name='posts-by-title'),
     path('posts-by-user/', FilterPostByUserView.as_view(), name='posts-by-user'),
+    path('edit-post/<int:post_id>/', EditPostView.as_view(), name='edit-post'),
+    path('delete-post/<int:post_id>/', DeletePostView.as_view(), name='delete-post'),
 
     # ============================
     # CATEGORÍAS
