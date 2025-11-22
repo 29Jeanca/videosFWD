@@ -20,6 +20,8 @@ from .views import (
     CommentPostView,
     CommentByPostView,
     FilterCommentByUserView,
+    EditCommentView,
+    DeleteCommentView,
 
     # LIKES
     LikeUnlikePostView,
@@ -55,6 +57,8 @@ urlpatterns = [
     path('comment-post/', CommentPostView.as_view(), name='comment-post'),
     path('post-comments/<int:post_id>/', CommentByPostView.as_view(), name='comments-by-post'),
     path('comments-by-user/', FilterCommentByUserView.as_view(), name='comments-by-user'),
+    path('edit-comment/<int:comment_id>/', EditCommentView.as_view(), name='edit-comment'),
+    path('delete-comment/<int:comment_id>/', DeleteCommentView.as_view(), name='delete-comment'),
 
     # ============================
     # LIKES

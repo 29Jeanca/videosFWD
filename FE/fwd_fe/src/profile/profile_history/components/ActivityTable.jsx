@@ -10,20 +10,24 @@ import {
   Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useState } from "react";
 import EditTopicModal from "./EditTopicModal";
 import DeleteModal from "./DeleteModal";
 import { Delete } from "@mui/icons-material";
-import { deletePost } from "../../services/validate";
+import {
+  deleteComment,
+  deletePost,
+  editComment,
+  postLikeUnlike,
+} from "../../services/validate";
+import EditCommentModal from "./EditCommentModal";
 
 export default function ActivityTable({ info, showEdit, reloadInfo }) {
   const [showModalPost, setShowModalPost] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditCommentModal, setShowEditCommentModal] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
   const formaterDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CR", {
@@ -35,6 +39,24 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
 
   const deleteInfo = async (id) => {
     const response = await deletePost(id);
+    console.log(response);
+    return response;
+  };
+
+  const editCommentPost = async (id, newText) => {
+    const response = await editComment(id, newText);
+    console.log(response);
+    return response;
+  };
+
+  const deleteCommentPost = async (id) => {
+    const response = await deleteComment(id);
+    console.log(response);
+    return response;
+  };
+
+  const unlikePost = async (id) => {
+    const response = await postLikeUnlike(id);
     console.log(response);
     return response;
   };
@@ -130,8 +152,14 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
                     {showEdit && (
                       <EditIcon
                         onClick={() => {
-                          setShowModalPost(true);
-                          setSelectedTopic(row);
+                          if (row.is_post) {
+                            setShowModalPost(true);
+                            setSelectedTopic(row);
+                          }
+                          if (row.is_comment) {
+                            setShowEditCommentModal(true);
+                            setSelectedTopic(row);
+                          }
                         }}
                         fontSize="small"
                       />
@@ -142,9 +170,21 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
                     <Delete
                       fontSize="small"
                       onClick={() => {
-                        setShowDeleteModal(true);
-                        setSelectedTopic(row);
-                        reloadInfo();
+                        if (row.is_post) {
+                          setShowDeleteModal(true);
+                          setSelectedTopic(row);
+                          reloadInfo();
+                        }
+                        if (row.is_like) {
+                          setShowDeleteModal(true);
+                          setSelectedTopic(row);
+                          reloadInfo();
+                        }
+                        if (row.is_comment) {
+                          setShowDeleteModal(true);
+                          setSelectedTopic(row);
+                          reloadInfo();
+                        }
                       }}
                     />
                   </IconButton>
@@ -169,10 +209,24 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
             onCancel={() => setShowDeleteModal(false)}
             onConfirm={() => {
               setShowDeleteModal(false);
-              setConfirmDelete(true);
-              deleteInfo(selectedTopic.id).then(() => {
-                reloadInfo();
-              });
+              if (selectedTopic.is_post) {
+                deleteInfo(selectedTopic.id).then(() => {
+                  reloadInfo();
+                });
+                return;
+              }
+              if (selectedTopic.is_like) {
+                unlikePost(selectedTopic.post).then(() => {
+                  reloadInfo();
+                });
+                return;
+              }
+              if (selectedTopic.is_comment) {
+                deleteCommentPost(selectedTopic.id).then(() => {
+                  reloadInfo();
+                });
+                return;
+              }
             }}
           />
         )}
@@ -185,6 +239,23 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
               reloadInfo();
             }}
             existingTopic={selectedTopic}
+          />
+        )}
+
+        {showEditCommentModal && (
+          <EditCommentModal
+            open={showEditCommentModal}
+            onClose={() => {
+              setShowEditCommentModal(false);
+              reloadInfo();
+            }}
+            onSave={(newText) => {
+              editCommentPost(selectedTopic.id, newText).then(() => {
+                setShowEditCommentModal(false);
+                reloadInfo();
+              });
+            }}
+            initialText={selectedTopic ? selectedTopic.content : ""}
           />
         )}
 

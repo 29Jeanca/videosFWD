@@ -214,6 +214,41 @@ const postNewComment = async (commentData) => {
   return data;
 };
 
+const editComment = async (commentId, newText) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(
+    `http://localhost:8000/community/edit-comment/${commentId}/`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({ content: newText }),
+      credentials: "include",
+    }
+  );
+
+  const data = await response.json();
+  return data;
+};
+
+
+const deleteComment = async (commentId) => {
+  const csrftoken = getCookie("csrftoken");
+  const response = await fetch(`http://localhost:8000/community/delete-comment/${commentId}/`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include", 
+  });
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+
 
 // ===============================
 // LIKES
@@ -292,4 +327,6 @@ export {
   getInfoByFilter,
   editPost,
   deletePost,
+  editComment,
+  deleteComment,
 };

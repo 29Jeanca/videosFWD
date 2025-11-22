@@ -157,7 +157,6 @@ class GetAllLikes(APIView):
         serializer = LikePostSerializer(likes, many=True)
         return Response(serializer.data)
 class LikeUnlikePostView(APIView):
-    # Like/unlike a un post
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -301,3 +300,46 @@ class DeletePostView(APIView):
 
         post.delete()
         return Response({"message": "Post eliminado correctamente"})
+
+
+# ============================
+# EDITAR Y BORRAR COMENTARIOS
+# ============================
+
+class DeleteCommentView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, comment_id):
+        user = request.user
+        try:
+            comment = CommentPost.objects.get(id=comment_id, user=user)
+        except CommentPost.DoesNotExist:
+            return Response(
+                {"error": "Comentario no encontrado o no autorizado"},
+                status=404
+            )
+
+        comment.delete()
+        return Response({"message": "Comentario eliminado correctamente"})
+
+class EditCommentView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, comment_id):
+        user = request.user
+        try:
+            comment = CommentPost.objects.get(id=comment_id, user=user)
+        except CommentPost.DoesNotExist:
+            return Response({"error": "Comentario no encontrado o no autorizado"}, status=404)
+
+        content = request.data.get('content')
+
+        if content:
+            comment.content = content
+            comment.save()
+            serializer = CommentPostSerializer(comment)
+            return Response(serializer.data)
+        else:
+            return Response({"error": "El contenido no puede estar vacío"}, status=400)
