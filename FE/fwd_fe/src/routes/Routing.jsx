@@ -4,8 +4,9 @@ import ProfilePage from "../profile/pages/ProfilePage";
 import CommunityPage from "../profile/profile_community/pages/CommunityPage";
 import PostPage from "../profile/profile_community/pages/PostPage";
 import NotFoundPage from "../profile/profile_community/errors/pages/NotFoundPage";
-const Routing = () => {
+import ActivityPage from "../profile/profile_history/pages/ActivityPage";
 
+const Routing = () => {
   return (
     <Router>
       <Routes>
@@ -13,6 +14,7 @@ const Routing = () => {
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/comunidad" element={<CommunityPage />} />
         <Route path="/post/:postId" element={<PostPage />} />
+        <Route path="/actividad" element={<ActivityPage />} /> 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>

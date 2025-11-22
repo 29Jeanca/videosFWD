@@ -16,10 +16,10 @@ class CategoryPostSerializer(serializers.ModelSerializer):
 
 class CommentPostSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.username', read_only=True)
-
+    post_comment = serializers.CharField(source='post.title', read_only=True)
     class Meta:
         model = CommentPost
-        fields = ['id', 'post', 'user', 'user_name', 'content', 'created_at', 'anonymous']
+        fields = ['id', 'post', 'user', 'user_name', 'content', 'created_at', 'anonymous', 'post_comment']
 
 class AnswerCommentSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.username', read_only=True)
@@ -31,6 +31,7 @@ class AnswerCommentSerializer(serializers.ModelSerializer):
 class LikePostSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.username', read_only=True)
     user_id = serializers.IntegerField(source='user.id', read_only=True)
+    post_title = serializers.CharField(source='post.title', read_only=True)
     class Meta:
         model = LikePost
-        fields = ['id', 'post', 'user', 'created_at', 'user_name', 'user_id']
+        fields = ['id', 'post', 'user', 'created_at', 'user_name', 'user_id', 'post_title']

@@ -3,7 +3,7 @@ import CourseCard from "./CourseCard";
 import { useState } from "react";
 
 export default function Courses() {
-  const [courses,setCourses] = useState([])
+  const [courses] = useState([])
 
   return (
     <Card>

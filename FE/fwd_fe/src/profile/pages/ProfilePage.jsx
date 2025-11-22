@@ -60,6 +60,11 @@ export default function ProfilePage() {
           setShowUserProfile(false);
         }}
         communityActive={showCommunity}
+
+        history={()=>{
+          navigate('/actividad')
+        }}
+
       />
 
       <Box flex={1} p={{ xs: 2, md: 5 }}>
