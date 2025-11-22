@@ -5,6 +5,7 @@ import CommunityPage from "../profile/profile_community/pages/CommunityPage";
 import PostPage from "../profile/profile_community/pages/PostPage";
 import NotFoundPage from "../profile/profile_community/errors/pages/NotFoundPage";
 import ActivityPage from "../profile/profile_history/pages/ActivityPage";
+import CalendarPage from "../profile/profile_calendar/pages/CalendarPage";
 
 const Routing = () => {
   return (
@@ -16,6 +17,7 @@ const Routing = () => {
         <Route path="/post/:postId" element={<PostPage />} />
         <Route path="/actividad" element={<ActivityPage />} /> 
         <Route path="*" element={<NotFoundPage />} />
+        <Route path="/calendario" element={<CalendarPage />} />
       </Routes>
     </Router>
   );

@@ -42,6 +42,9 @@ export default function ActivityPage() {
             profileActive={false}
             communityActive={false}
             community={()=> navigate('/perfil')}
+            calendar={()=> navigate('/calendario')}
+            calendarActive={false}
+            profile={()=> navigate('/perfil')}
         />
 
         <Box flex={1} p={{ xs: 2, md: 4 }} minHeight="100vh" width="100%">

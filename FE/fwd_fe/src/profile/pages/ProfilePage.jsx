@@ -64,6 +64,10 @@ export default function ProfilePage() {
         history={()=>{
           navigate('/actividad')
         }}
+        calendar={()=>{
+          navigate('/calendario')
+        }}
+
 
       />
 
