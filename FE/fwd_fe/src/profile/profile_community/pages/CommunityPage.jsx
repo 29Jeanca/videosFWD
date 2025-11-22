@@ -131,7 +131,6 @@ export default function CommunityPage() {
         <Grid item xs={12}>
           <Header reloadTopics={fetchData} />
 
-          <SearchBar />
 
           {/* TABS QUE CAMBIAN LA VISTA */}
           <TabSelection onTabChange={handleTabFilter} />

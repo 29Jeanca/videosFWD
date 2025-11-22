@@ -31,7 +31,6 @@ export default function ActivityPage() {
         loadTableInfo();
     }, [filter]);
 
-    // 👉 ESTA ES LA FUNCIÓN IMPORTANTE
     const reloadInfo = () => loadTableInfo();
 
     return (

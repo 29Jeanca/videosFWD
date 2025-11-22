@@ -17,6 +17,7 @@ import EditTopicModal from "./EditTopicModal";
 import DeleteModal from "./DeleteModal";
 import { Delete } from "@mui/icons-material";
 import { deletePost } from "../../services/validate";
+
 export default function ActivityTable({ info, showEdit, reloadInfo }) {
   const [showModalPost, setShowModalPost] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,6 +32,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
       day: "numeric",
     });
   };
+
   const deleteInfo = async (id) => {
     const response = await deletePost(id);
     console.log(response);
@@ -50,14 +52,15 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
           <TableHead sx={{ bgcolor: "action.hover" }}>
             <TableRow>
               <TableCell sx={{ fontSize: 12, textTransform: "uppercase" }}>
-                Título
+                <b>Título</b>
               </TableCell>
               <TableCell sx={{ fontSize: 12, textTransform: "uppercase" }}>
-                Fecha
+                <b>Fecha</b>
               </TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
+
           {info.length === 0 && (
             <TableBody>
               <TableRow>
@@ -71,13 +74,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
           )}
           <TableBody>
             {info.map((row) => (
-              <TableRow
-                key={row.id}
-                hover
-                sx={{
-                  transition: "0.2s",
-                }}
-              >
+              <TableRow key={row.id} hover sx={{ transition: "0.2s" }}>
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={2}>
                     <Box
@@ -96,15 +93,27 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
                     </Box>
 
                     <Box>
-                      <Typography fontWeight={600}>{row.title}</Typography>
+                      <Typography fontWeight={600}>
+                        <b>{row.title}</b>
+                      </Typography>
+
                       <Typography variant="body2" color="text.secondary">
-                        {row.category_name
-                          ? `Publicado en la categoría de ${row.category_name}`
-                          : row.post_comment
-                          ? `Comentario en el post: ${row.post_comment}`
-                          : row.post_title
-                          ? `Like en el post: ${row.post_title}`
-                          : ""}
+                        {row.category_name ? (
+                          <>
+                            <b>Publicado en:</b> {row.category_name}
+                          </>
+                        ) : row.post_comment ? (
+                          <>
+                            <b>Comentaste:</b> "{row.content}" en el post:{" "}
+                            <b>{row.post_comment}</b>
+                          </>
+                        ) : row.post_title ? (
+                          <>
+                            <b>Like en:</b> {row.post_title}
+                          </>
+                        ) : (
+                          ""
+                        )}
                       </Typography>
                     </Box>
                   </Box>
@@ -112,7 +121,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
 
                 <TableCell>
                   <Typography variant="body2" color="text.secondary">
-                    {formaterDate(row.created_at)}
+                    <b>{formaterDate(row.created_at)}</b>
                   </Typography>
                 </TableCell>
 
@@ -128,6 +137,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
                       />
                     )}
                   </IconButton>
+
                   <IconButton>
                     <Delete
                       fontSize="small"
@@ -153,9 +163,6 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
         borderTop="1px solid"
         borderColor="divider"
       >
-        <Typography variant="body2" color="text.secondary">
-          {/* Mostrando <b>1</b> a <b>4</b> de <b>12</b> resultados */}
-        </Typography>
         {showDeleteModal && (
           <DeleteModal
             open={showDeleteModal}
@@ -169,6 +176,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
             }}
           />
         )}
+
         {showModalPost && (
           <EditTopicModal
             open={showModalPost}
@@ -179,13 +187,10 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
             existingTopic={selectedTopic}
           />
         )}
+
         <Box display="flex" gap={1}>
-          <Box>
-            <Button variant="outlined">Anterior</Button>
-          </Box>
-          <Box>
-            <Button variant="outlined">Siguiente</Button>
-          </Box>
+          <Button variant="outlined">Anterior</Button>
+          <Button variant="outlined">Siguiente</Button>
         </Box>
       </Box>
     </>
