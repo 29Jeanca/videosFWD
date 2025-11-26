@@ -1,32 +1,26 @@
 // CalendarMonth.jsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
-  Grid,
   Typography,
   IconButton,
   Button,
-  Stack,
 } from "@mui/material";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import ChevronRight from "@mui/icons-material/ChevronRight";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import { getAllEvents } from "../services/validate";
+import { useNavigate } from "react-router-dom";
+import ModalCreateEvent from "./ModalCreateEvent";
 
 const WEEK_DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-/**
- * Utility: retorna array de 42 Date objects que llenan la cuadrícula (6 semanas)
- * centrada en el mes de referencia (current)
- */
 function generateMonthGrid(current) {
   const year = current.getFullYear();
   const month = current.getMonth();
 
-  // Primer día del mes
   const firstOfMonth = new Date(year, month, 1);
-  // Día de la semana (0=Dom)
   const startWeekDay = firstOfMonth.getDay();
-  // Start date = primer casillero del calendario (puede ser del mes anterior)
+
   const gridStart = new Date(firstOfMonth);
   gridStart.setDate(firstOfMonth.getDate() - startWeekDay);
 
@@ -39,32 +33,44 @@ function generateMonthGrid(current) {
   return days;
 }
 
-/**
- * Eventos de ejemplo (copiados del HTML original, para Septiembre 2024).
- * La clave es 'YYYY-MM-DD'
- */
-const SAMPLE_EVENTS = {
-  "2024-09-02": [{ title: "Evento Comunidad", color: "blue" }],
-  "2024-09-04": [{ title: "Clase: Intro a React", color: "green" }],
-  "2024-09-06": [{ title: "Taller: Hooks Avanzados", color: "orange" }],
-  "2024-09-11": [{ title: "Clase: State Management", color: "green" }],
-  "2024-09-13": [{ title: "Entrega: Proyecto 1", color: "red" }],
-  "2024-09-16": [{ title: "Networking", color: "blue", highlight: true }],
-  "2024-09-18": [{ title: "Clase: Routing", color: "green" }],
-  "2024-09-25": [{ title: "Clase: Backend Intro", color: "green" }],
-  "2024-09-30": [{ title: "Entrega Final", color: "red" }],
-};
-
 function formatKey(d) {
   return d.toISOString().slice(0, 10);
 }
 
 export default function CalendarMonth({ initialDate = new Date() }) {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [infoEvent, setInfoEvent] = useState({
+    title: "",
+    description: "",
+    date: "",
+    color: "",
+  });
+  const [eventsInfo, setEventsInfo] = useState({});
+
   const [current, setCurrent] = useState(() => {
-    // Start at the initialDate provided but normalized to first day of month
     const cl = new Date(initialDate);
     return new Date(cl.getFullYear(), cl.getMonth(), 1);
   });
+
+  useEffect(() => {
+    async function fetchEvents() {
+      const response = await getAllEvents();
+      
+      if (response.detail === "Authentication credentials were not provided.") {
+        navigate("/");
+        return;
+      }
+
+      if (typeof response === "object" && !Array.isArray(response)) {
+        setEventsInfo(response);
+      } else {
+        setEventsInfo({});
+      }
+    }
+    fetchEvents();
+  }, []);
 
   const today = useMemo(() => {
     const t = new Date();
@@ -74,7 +80,6 @@ export default function CalendarMonth({ initialDate = new Date() }) {
   const days = useMemo(() => generateMonthGrid(current), [current]);
 
   const monthLabel = useMemo(() => {
-    // e.g., "Septiembre 2024" in Spanish (es-CR)
     return new Intl.DateTimeFormat("es-CR", {
       month: "long",
       year: "numeric",
@@ -92,97 +97,13 @@ export default function CalendarMonth({ initialDate = new Date() }) {
     setCurrent(new Date(t.getFullYear(), t.getMonth(), 1));
   }
 
+  const handleSaveEvent = (eventData) => {
+    console.log("Evento guardado:", eventData);
+    setShowModal(false);
+  };
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        height: "100%",
-      }}
-    >
-      {/* Header (title + view toggles) */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          Calendario
-        </Typography>
-
-        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-          <Box
-            sx={{
-              display: "flex",
-              bgcolor: "background.paper",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 1,
-              p: 0.5,
-            }}
-          >
-            <Box
-              component="label"
-              sx={{
-                px: 2,
-                py: "6px",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                borderRadius: 1,
-                color: "text.secondary",
-                fontSize: 14,
-                fontWeight: 600,
-                "& input": { display: "none" },
-                bgcolor: (theme) => "transparent",
-              }}
-            >
-              Mes
-              <input name="calendar-view" type="radio" defaultChecked />
-            </Box>
-
-            <Box
-              component="label"
-              sx={{
-                px: 2,
-                py: "6px",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                borderRadius: 1,
-                color: "text.secondary",
-                fontSize: 14,
-                fontWeight: 600,
-              }}
-            >
-              Semana
-              <input name="calendar-view" type="radio" />
-            </Box>
-
-            <Box
-              component="label"
-              sx={{
-                px: 2,
-                py: "6px",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                borderRadius: 1,
-                color: "text.secondary",
-                fontSize: 14,
-                fontWeight: 600,
-              }}
-            >
-              Día
-              <input name="calendar-view" type="radio" />
-            </Box>
-          </Box>
-        </Stack>
-      </Box>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
 
       {/* Toolbar */}
       <Box
@@ -208,50 +129,26 @@ export default function CalendarMonth({ initialDate = new Date() }) {
 
           <Typography sx={{ fontWeight: 700, ml: 1 }}>{monthLabel}</Typography>
 
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={goToday}
-            sx={{ ml: 3 }}
-          >
+          <Button variant="outlined" size="small" onClick={goToday} sx={{ ml: 3 }}>
             Hoy
-          </Button>
-        </Box>
-
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="contained"
-            size="small"
-            sx={{ bgcolor: "grey.100", color: "text.primary", textTransform: "none" }}
-            startIcon={<ExpandMore />}
-          >
-            Módulo
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            sx={{ bgcolor: "grey.100", color: "text.primary", textTransform: "none" }}
-            startIcon={<ExpandMore />}
-          >
-            Tipo de Evento
           </Button>
         </Box>
       </Box>
 
-      {/* Grid */}
+      {/* Calendar Grid */}
       <Box
         sx={{
           flex: 1,
           display: "grid",
           gridTemplateColumns: "repeat(7, 1fr)",
-          gridTemplateRows: "auto 1fr 1fr 1fr 1fr 1fr",
+          gridTemplateRows: "auto repeat(6, 1fr)",
           gap: "1px",
           bgcolor: "divider",
           borderRadius: 2,
           overflow: "hidden",
         }}
       >
-        {/* Weekday headers */}
+        {/* Week headers */}
         {WEEK_DAYS.map((d) => (
           <Box
             key={d}
@@ -268,7 +165,7 @@ export default function CalendarMonth({ initialDate = new Date() }) {
           </Box>
         ))}
 
-        {/* Days (42 cells) */}
+        {/* Days */}
         {days.map((day, idx) => {
           const isCurrentMonth = day.getMonth() === current.getMonth();
           const isToday =
@@ -277,11 +174,22 @@ export default function CalendarMonth({ initialDate = new Date() }) {
             day.getDate() === today.getDate();
 
           const key = formatKey(day);
-          const events = SAMPLE_EVENTS[key] || [];
+          const events = eventsInfo[key] || [];
 
           return (
             <Box
               key={key + idx}
+              onClick={() => {
+                setSelectedDate(key);
+                setShowModal(true);
+                console.log("Clicked", key);
+                setInfoEvent({
+                  title: "",
+                  description: "",
+                  date: key,
+                  color: "green",
+                });
+              }}
               sx={{
                 p: 1.25,
                 minHeight: 110,
@@ -291,10 +199,11 @@ export default function CalendarMonth({ initialDate = new Date() }) {
                 borderLeft: "1px solid",
                 borderColor: "divider",
                 position: "relative",
+                cursor: "pointer",
               }}
             >
               {/* Day number */}
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   sx={{
                     fontWeight: isToday ? 700 : 600,
@@ -325,7 +234,7 @@ export default function CalendarMonth({ initialDate = new Date() }) {
                 )}
               </Box>
 
-              {/* Events list (small) */}
+              {/* Events */}
               <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 0.5 }}>
                 {events.map((ev, i) => {
                   const bg =
@@ -374,6 +283,16 @@ export default function CalendarMonth({ initialDate = new Date() }) {
           );
         })}
       </Box>
+
+      {showModal && (
+        <ModalCreateEvent
+          open={showModal}
+          onClose={() => setShowModal(false)}
+          onSave={handleSaveEvent}
+          date={selectedDate}
+          infoEvent={infoEvent}
+        />
+      )}
     </Box>
   );
 }
