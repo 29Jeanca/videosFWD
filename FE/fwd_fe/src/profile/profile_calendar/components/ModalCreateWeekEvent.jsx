@@ -24,19 +24,21 @@ const COLORS = [
   { name: "purple", hex: "#a855f7" },
 ];
 
-export default function ModalCreateEvent({ open, onClose, onSave, infoEvent }) {
+export default function ModalCreateWeekEvent({ open, onClose, onSave, infoEvent }) {
   const [title, setTitle] = useState(infoEvent.title || "");
   const [description, setDescription] = useState(infoEvent.description || "");
+  const [startDate, setStartDate] = useState(infoEvent.startDate || "");
+  const [endDate, setEndDate] = useState(infoEvent.endDate || "");
   const [color, setColor] = useState(infoEvent.color || "green");
 
-  const isDisabled = title.trim() === "" || description.trim() === "";
+  const isDisabled = title.trim() === "" || description.trim() === "" || startDate.trim() === "" || endDate.trim() === "";
 
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (isDisabled) return; 
-    const response = await postEvent({ title, description, color, date: infoEvent.date });
+    const response = await postEvent({ title, description, color, date: startDate, fecha_inicio: startDate, fecha_fin: endDate });
     console.log(response);
-    onSave({ title, description, color, date: infoEvent.date });
+    onSave({ title, description, color, date: startDate, startDate, endDate });
   };
 
   return (
@@ -94,6 +96,32 @@ export default function ModalCreateEvent({ open, onClose, onSave, infoEvent }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+
+            {/* FECHA INICIO */}
+            <TextField
+            label="Fecha y Hora de Inicio"
+            type="datetime-local"
+            fullWidth
+            size="small"
+            InputLabelProps={{
+                shrink: true,
+            }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+            {/* FECHA FIN */}
+            <TextField
+            label="Fecha y Hora de Fin"
+            type="datetime-local"
+            fullWidth
+            size="small"
+            InputLabelProps={{
+                shrink: true,
+            }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            />
+
 
           {/* SELECTOR DE COLOR */}
           <Box>

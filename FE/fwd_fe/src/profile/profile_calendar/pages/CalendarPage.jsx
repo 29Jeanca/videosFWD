@@ -102,9 +102,9 @@ export default function CalendarPage() {
             onChange={handleViewChange}
             size="small"
           >
-            <ToggleButton value="month">Mes</ToggleButton>
-            <ToggleButton value="week">Semana</ToggleButton>
-            <ToggleButton value="day">Día</ToggleButton>
+            {/* <ToggleButton value="month">Mes</ToggleButton> */}
+            {/* <ToggleButton value="week">Semana</ToggleButton>
+            <ToggleButton value="day">Día</ToggleButton> */}
           </ToggleButtonGroup>
         </Paper>
 
@@ -118,23 +118,23 @@ export default function CalendarPage() {
           />
         )}
 
-        {view === "week" && (
+        {/* {view === "week" && (
           <CalendarWeek
             currentDate={currentDate}
             goPrev={goPrev}
             goNext={goNext}
             goToday={goToday}
           />
-        )}
+        )} */}
 
-        {view === "day" && (
+        {/* {view === "day" && (
           <CalendarDay
             currentDate={currentDate}
             goPrev={goPrev}
             goNext={goNext}
             goToday={goToday}
           />
-        )}
+        )} */}
       </Box>
     </Box>
   );

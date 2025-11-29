@@ -104,7 +104,6 @@ export default function CalendarMonth({ initialDate = new Date() }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
-
       {/* Toolbar */}
       <Box
         sx={{
