@@ -6,6 +6,7 @@ import PostPage from "../profile/profile_community/pages/PostPage";
 import NotFoundPage from "../profile/profile_community/errors/pages/NotFoundPage";
 import ActivityPage from "../profile/profile_history/pages/ActivityPage";
 import CalendarPage from "../profile/profile_calendar/pages/CalendarPage";
+import PaginaClases from "../courses/main_courses/pages/PaginaClases";
 
 const Routing = () => {
   return (
@@ -18,6 +19,7 @@ const Routing = () => {
         <Route path="/actividad" element={<ActivityPage />} /> 
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/calendario" element={<CalendarPage />} />
+        <Route path="/cursos" element={<PaginaClases />} />
       </Routes>
     </Router>
   );
