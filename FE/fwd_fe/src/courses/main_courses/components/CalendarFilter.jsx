@@ -15,12 +15,12 @@ export default function CalendarFilter() {
         <DateCalendar
           value={selectedDate}
           onChange={(newDate) => setSelectedDate(newDate)}
-          views={['day']}
+          views={['month', 'day']}
           sx={{
             bgcolor: theme => theme.palette.mode === 'dark' ? 'background.default' : 'background.paper',
-            borderRadius: 2,
+            borderRadius: 5,
             p: 1,
-            border: '1px solid',
+            border: '2px solid',
             borderColor: theme => theme.palette.divider,
           }}
         />

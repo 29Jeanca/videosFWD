@@ -1,6 +1,12 @@
 import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
 
-export default function ClassCard({ title, date, instructor, duration, tags = [], image }) {
+export default function ClassCard({ title, created_at, teacher, duration=0, tags = [], thumbnail_img }) {
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, options);
+  }
   return (
     <Card
       elevation={2}
@@ -15,7 +21,7 @@ export default function ClassCard({ title, date, instructor, duration, tags = []
       <Box
         sx={{
           aspectRatio: '16/9',
-          backgroundImage: `url(${image})`,
+          backgroundImage: `url(${thumbnail_img})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           width: '100%',
@@ -44,7 +50,7 @@ export default function ClassCard({ title, date, instructor, duration, tags = []
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary" mt={1}>
-          {date} | {instructor} | {duration}
+          {formatDate(created_at)} | {teacher} | {duration}
         </Typography>
       </CardContent>
     </Card>

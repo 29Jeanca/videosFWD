@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'users',
     'community',
     'events',
+    'courses',
 ]
 AUTH_USER_MODEL = 'users.User'
 
