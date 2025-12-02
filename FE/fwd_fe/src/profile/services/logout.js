@@ -4,6 +4,7 @@ const logoutUser = async () => {
       method: "POST",
       credentials: "include",
     });
+    window.location.href = '/';
   } catch (err) {
     console.error("Error al cerrar sesión:", err);
   } 
