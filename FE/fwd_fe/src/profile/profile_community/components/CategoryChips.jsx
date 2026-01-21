@@ -19,7 +19,7 @@ export default function CategoryChips({ clickedCategory, valueCategory }) {
   }, []);
 
   const handleChange = (_, newValue) => {
-    valueCategory(newValue); // ✅ newValue YA es el ID
+    valueCategory(newValue); 
   };
 
   return (
@@ -64,7 +64,7 @@ export default function CategoryChips({ clickedCategory, valueCategory }) {
           <Tab
             key={cat.id}
             label={cat.name}
-            value={cat.id} // 🔥 EL ID REAL
+            value={cat.id} 
           />
         ))}
       </Tabs>
