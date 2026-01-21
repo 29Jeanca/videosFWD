@@ -4,35 +4,28 @@ import { getCategories } from "../../services/validate";
 
 export default function CategoryChips({ clickedCategory, valueCategory }) {
   const [categories, setCategories] = useState([]);
-  const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
         setCategories(response);
-
-        const initialIndex = response.findIndex(
-          (cat) => cat.id === clickedCategory
-        );
-        if (initialIndex !== -1) setTabValue(initialIndex);
       } catch (error) {
         console.error("Error al obtener categorías:", error);
       }
     };
+
     fetchCategories();
-  }, [clickedCategory]);
+  }, []);
 
   const handleChange = (_, newValue) => {
-    setTabValue(newValue);
-    const selected = categories[newValue];
-    if (selected) valueCategory(selected.id);
+    valueCategory(newValue); // ✅ newValue YA es el ID
   };
 
   return (
     <Box sx={{ width: "100%", mb: 3 }}>
       <Tabs
-        value={tabValue}
+        value={clickedCategory} // 🔥 EL ID
         onChange={handleChange}
         variant="scrollable"
         scrollButtons="auto"
@@ -61,20 +54,18 @@ export default function CategoryChips({ clickedCategory, valueCategory }) {
             },
           },
 
-          // ⭐ Seleccionado = color #414071
           "& .Mui-selected": {
             backgroundColor: "#414071 !important",
             color: "white !important",
           },
-
-          "& .MuiTabs-scrollButtons": {
-            width: "32px",
-            borderRadius: "50%",
-          },
         }}
       >
         {categories.map((cat) => (
-          <Tab key={cat.id} label={cat.name} />
+          <Tab
+            key={cat.id}
+            label={cat.name}
+            value={cat.id} // 🔥 EL ID REAL
+          />
         ))}
       </Tabs>
     </Box>

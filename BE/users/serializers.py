@@ -24,6 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
         if not any(char.isdigit() for char in data['password']):
             raise serializers.ValidationError("La contraseña debe contener al menos un número.")
 
+        return data
+
         
         
 
@@ -34,6 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
             user.set_password(password)
             user.save()
             return user
+
 
 
 

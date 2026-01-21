@@ -1,56 +1,81 @@
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Button } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  TextField,
+  Button
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CategoryChips from "./CategoryChips";
 import { newPost } from "../../services/validate";
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 export default function CreateTopicModal({ open, onClose, reloadTopics }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState(null);
   const [anonymous, setAnonymous] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleCategorySelect = (catId) => {
     setCategory(catId);
   };
 
+  const resetForm = () => {
+    setTitle("");
+    setContent("");
+    setCategory(null);
+    setAnonymous(false);
+  };
+
   const postTopic = async () => {
     const newTopic = {
-      title,
-      content,
+      title: title.trim(),
+      content: content.trim(),
       category,
-      anonymous,
+      anonymous
     };
 
-    const postedTopic = await newPost(newTopic);
-    console.log(postedTopic);
+    try {
+      setLoading(true);
+      await newPost(newTopic);
+      resetForm();
+      onClose();
+      if (reloadTopics) reloadTopics();
+    } catch (error) {
+      console.error("Error al publicar el tema:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleClose = () => {
+    resetForm();
     onClose();
-
-    
-    if (reloadTopics) reloadTopics();
   };
 
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       fullWidth
       maxWidth="md"
       PaperProps={{
         sx: {
           borderRadius: 3,
-          bgcolor: "background.paper",
-        },
+          bgcolor: "background.paper"
+        }
       }}
     >
       <DialogTitle
         sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
         Crear un Nuevo Tema en el Foro de Comunidad
-        <IconButton onClick={onClose}>
+        <IconButton onClick={handleClose}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -78,19 +103,34 @@ export default function CreateTopicModal({ open, onClose, reloadTopics }) {
           onChange={(e) => setContent(e.target.value)}
           margin="normal"
         />
-      
-      <FormControlLabel control={<Checkbox checked={anonymous} onChange={(e) => setAnonymous(e.target.checked)} />} label="Anónimo" />
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={anonymous}
+              onChange={(e) => setAnonymous(e.target.checked)}
+            />
+          }
+          label="Anónimo"
+        />
       </DialogContent>
-      
+
       <DialogActions>
-        <Button onClick={onClose} variant="outlined">Cancelar</Button>
+        <Button onClick={handleClose} variant="outlined" disabled={loading}>
+          Cancelar
+        </Button>
 
         <Button
           variant="contained"
-          disabled={!title.trim() || !content.trim() || !category}
+          disabled={
+            loading ||
+            !title.trim() ||
+            !content.trim() ||
+            category === null
+          }
           onClick={postTopic}
         >
-          Publicar Tema
+          {loading ? "Publicando..." : "Publicar Tema"}
         </Button>
       </DialogActions>
     </Dialog>
