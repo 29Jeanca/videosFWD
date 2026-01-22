@@ -18,6 +18,17 @@ class UserCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class UserEmailCheckView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+
+        if not email:
+            return Response({"message": "Email es requerido."}, status=400)
+        
+        if User.objects.filter(email=email).exists():
+            return Response({"message": "El correo de recuperación ya fue enviado."}, status=200)
+        
+        return Response({"message": "El correo no está registrado."}, status=404)
 
 class UserLogin(APIView):
     def post(self, request):

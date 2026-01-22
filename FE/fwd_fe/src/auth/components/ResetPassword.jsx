@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -7,6 +7,7 @@ import {
   Button,
   InputAdornment,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -14,6 +15,8 @@ import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+import emailjs from "@emailjs/browser";
+import { checkEmail, sendRecoverCode, resetPassword } from "../services/validate";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
@@ -21,8 +24,75 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showFormPassword, setShowFormPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({ show: false, type: "info", message: "" });
 
   const navigate = useNavigate();
+
+  const sendRecoveryEmail = async (email, code) => {
+    return emailjs.send(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      { email, code },
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+    );
+  };
+
+  const showAlert = (type, message) => {
+    setAlert({ show: true, type, message });
+  };
+
+  const validateEmail = async () => {
+    if (!email) {
+      showAlert("warning", "Debes ingresar un correo");
+      return;
+    }
+
+    setLoading(true);
+    setAlert({ show: false, type: "", message: "" });
+
+    try {
+      const response = await checkEmail(email);
+
+      if (response.message === "El correo no está registrado.") {
+        showAlert("error", "El correo no está registrado");
+        return;
+      }
+
+      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const emailResponse = await sendRecoverCode(email, generatedCode);
+
+      if (emailResponse.message === "Código de recuperación enviado.") {
+        await sendRecoveryEmail(email, generatedCode);
+        setShowFormPassword(true);
+        showAlert("success", "Código enviado correctamente. Revisa tu correo");
+      }
+    } catch {
+      showAlert("error", "Ocurrió un error al enviar el correo");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changePassword = async () => {
+    if (!code || !newPassword || !confirmPassword) {
+      showAlert("warning", "Todos los campos son obligatorios");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showAlert("warning", "Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      const response = await resetPassword(email, code, newPassword);
+      showAlert("success", response.message);
+    } catch {
+      showAlert("error", "No se pudo actualizar la contraseña");
+    }
+  };
 
   return (
     <Box
@@ -52,68 +122,66 @@ const ResetPassword = () => {
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ mb: 4, textAlign: "center" }}
+          sx={{ mb: 2, textAlign: "center" }}
         >
           Ingresa el código enviado a tu correo y tu nueva clave.
         </Typography>
 
-        {/* EMAIL */}
-        {!showFormPassword && (
-        <>
-        <Typography fontWeight={600} mb={1}>
-          Correo electrónico
-        </Typography>
-        <TextField
-          fullWidth
-          placeholder="estudiantefwd@.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <EmailOutlinedIcon color="action" />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ mb: 3 }}
-        />
+        {alert.show && (
+          <Alert severity={alert.type} sx={{ mb: 3 }}>
+            {alert.message}
+          </Alert>
+        )}
 
-        <Button 
-          fullWidth
-          size="large"
-          variant="contained"
-          sx={{
-            py: 1.4,
-            fontWeight: 600,
-            borderRadius: 2,
-            textTransform: "none",
-            bgcolor: "#2563eb",
-          }}  
-          onClick={() => setShowFormPassword(true)}
-        > 
-          Enviar Código de Recuperación
-        </Button>
-        </>
+        {!showFormPassword && (
+          <>
+            <Typography fontWeight={600} mb={1}>
+              Correo electrónico
+            </Typography>
+
+            <TextField
+              fullWidth
+              placeholder="estudiantefwd@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailOutlinedIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ mb: 3 }}
+            />
+
+            <Button
+              fullWidth
+              size="large"
+              variant="contained"
+              disabled={loading}
+              sx={{
+                py: 1.4,
+                fontWeight: 600,
+                borderRadius: 2,
+                textTransform: "none",
+                bgcolor: "#2563eb",
+              }}
+              onClick={validateEmail}
+            >
+              {loading ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Enviar Código de Recuperación"
+              )}
+            </Button>
+          </>
         )}
 
         {showFormPassword && (
           <>
-            {/* CÓDIGO */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 1,
-              }}
-            >
-              <Typography fontWeight={600}>
-                Código de recuperación
-              </Typography>
-              <Typography variant="caption" color="primary">
-                6 dígitos
-              </Typography>
-            </Box>
+            <Typography fontWeight={600} mb={1}>
+              Código de recuperación
+            </Typography>
 
             <TextField
               fullWidth
@@ -138,14 +206,13 @@ const ResetPassword = () => {
               sx={{ mb: 3 }}
             />
 
-            {/* NUEVA PASSWORD */}
             <Typography fontWeight={600} mb={1}>
               Nueva Contraseña
             </Typography>
+
             <TextField
               fullWidth
               type="password"
-              placeholder="••••••••"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               InputProps={{
@@ -158,14 +225,13 @@ const ResetPassword = () => {
               sx={{ mb: 3 }}
             />
 
-            {/* CONFIRMAR PASSWORD */}
             <Typography fontWeight={600} mb={1}>
               Confirmar Nueva Contraseña
             </Typography>
+
             <TextField
               fullWidth
               type="password"
-              placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               InputProps={{
@@ -178,7 +244,6 @@ const ResetPassword = () => {
               sx={{ mb: 3 }}
             />
 
-            {/* BOTÓN */}
             <Button
               fullWidth
               size="large"
@@ -191,27 +256,14 @@ const ResetPassword = () => {
                 bgcolor: "#2563eb",
               }}
               endIcon={<CheckCircleOutlineIcon />}
+              onClick={changePassword}
             >
               Actualizar Contraseña
             </Button>
-
-            {/* ALERTA */}
-            <Alert
-              severity="info"
-              sx={{
-                mt: 3,
-                bgcolor: "#f0f7ff",
-                border: "1px solid #dbeafe",
-              }}
-            >
-              Asegúrate de que tu nueva contraseña tenga al menos 8
-              caracteres, incluya una mayúscula y un número.
-            </Alert>
           </>
         )}
       </Card>
 
-      {/* VOLVER */}
       <Button
         startIcon={<ArrowBackIcon />}
         sx={{ mt: 3, textTransform: "none", color: "text.secondary" }}
@@ -220,12 +272,7 @@ const ResetPassword = () => {
         Volver al inicio de sesión
       </Button>
 
-      {/* FOOTER */}
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ mt: 4, textAlign: "center" }}
-      >
+      <Typography variant="caption" color="text.secondary" sx={{ mt: 4 }}>
         © 2026 FWD Bootcamp · Todos los derechos reservados
       </Typography>
     </Box>
