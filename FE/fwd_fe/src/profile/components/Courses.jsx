@@ -1,10 +1,23 @@
 import { Card, CardContent, Typography, Stack, Button } from "@mui/material";
 import CourseCard from "./CourseCard";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCourses } from "../../courses/main_courses/services/validate";
 export default function Courses() {
-  const [courses] = useState([])
+  const [courses, setCourses] = useState([])
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    const getLengthCourses = async() =>{
+      try {
+         const response = await getCourses()
+          setCourses(response)
+        } catch (error) {
+          console.error(error);
+      }
+    }
+    getLengthCourses()
+  },[])
   return (
     <Card>
       <CardContent>
@@ -22,9 +35,11 @@ export default function Courses() {
           variant="contained" color="primary" sx={{ alignSelf: 'flex-start' }}>
             Explorar Clases
           </Button>
-          {courses.map((c) => (
-            <CourseCard key={c.title} {...c} />
-          ))}
+          <Typography variant="body2" color="text.secondary">
+            Hay {courses.length} clase(s) inscrita(s)
+          </Typography>
+
+          
         </Stack>
       </CardContent>
     </Card>

@@ -2,6 +2,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User
+from .models import RecoverCode
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,5 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
-
-
+class RecoverCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecoverCode
+        fields = "__all__"

@@ -11,12 +11,24 @@ from rest_framework.exceptions import AuthenticationFailed
 from .models import User
 from .serializers import UserSerializer
 from .authentication import CookieJWTAuthentication
+from .models import RecoverCode
 
 
 class UserCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class UserEmailCheckView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+
+        if not email:
+            return Response({"message": "Email es requerido."}, status=400)
+        
+        if User.objects.filter(email=email).exists():
+            return Response({"message": "El correo de recuperación ya fue enviado."}, status=200)
+        
+        return Response({"message": "El correo no está registrado."}, status=404)
 
 class UserLogin(APIView):
     def post(self, request):
@@ -134,3 +146,46 @@ class LogoutView(APIView):
         response.delete_cookie("refresh_token", path="/")
         response.delete_cookie("csrftoken", path="/")
         return response
+    
+class SendRecoverCodeView(APIView):
+    def post(self,request):
+        email = request.data.get("email")
+        code = request.data.get("code")
+
+        if not email:
+            return Response({"message": "Email es requerido."}, status=400)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"message": "No existe una cuenta con ese correo."}, status=404)
+        
+        recover_code = RecoverCode.objects.create(user=user, code=code)
+
+        return Response({"message": "Código de recuperación enviado."})
+    
+class RecoverPasswordView(APIView):
+    def post(self,request):
+        email = request.data.get("email")
+        code = request.data.get("code")
+        new_password = request.data.get("new_password")
+
+        if not email or not code or not new_password:
+            return Response({"message": "Email, código y nueva contraseña son requeridos."}, status=400)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"message": "No existe una cuenta con ese correo."}, status=404)
+        
+        try:
+            recover_code = RecoverCode.objects.get(user=user, code=code)
+        except RecoverCode.DoesNotExist:
+            return Response({"message": "Código de recuperación inválido."}, status=400)
+        
+        user.set_password(new_password)
+        user.save()
+
+        recover_code.delete()
+
+        return Response({"message": "Contraseña recuperada exitosamente."})

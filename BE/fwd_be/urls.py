@@ -7,4 +7,5 @@ urlpatterns = [
     path('community/',include('community.urls')),
     path('events/',include('events.urls')),
     path('courses/',include('courses.urls')),
+    path('cloudinaryImgs/',include('cloudinaryImgs.urls')),
 ]

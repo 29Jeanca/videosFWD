@@ -11,7 +11,12 @@ import {
   CssBaseline,
   CircularProgress,
 } from "@mui/material";
-import { LightMode, DarkMode, Visibility } from "@mui/icons-material";
+import {
+  LightMode,
+  DarkMode,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { loginUser } from "../services/validate";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +28,8 @@ const LoginForm = () => {
   const [charging, setCharging] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(true);
 
   const validateUser = async () => {
     setCharging(true);
@@ -78,7 +85,7 @@ const LoginForm = () => {
           color: "text.primary",
         }}
       >
-        <Box sx={{ position: "absolute", top: 24, right: 24 }}>
+        {/* <Box sx={{ position: "absolute", top: 24, right: 24 }}>
           <IconButton onClick={() => setDarkMode(!darkMode)} color="inherit">
             {darkMode ? (
               <LightMode sx={{ fontSize: 28 }} />
@@ -86,7 +93,7 @@ const LoginForm = () => {
               <DarkMode sx={{ fontSize: 28 }} />
             )}
           </IconButton>
-        </Box>
+        </Box> */}
 
         {/* IMAGEN IZQUIERDA */}
         <Grid
@@ -106,13 +113,27 @@ const LoginForm = () => {
             justifyContent: "flex-start",
           }}
         >
-          <Box sx={{ position: "absolute", inset: 0, bgcolor: "rgba(0,0,0,0.5)" }} />
-          <Box sx={{ position: "relative", zIndex: 1, p: 6, color: "white", width: "100%" }}>
+          <Box
+            sx={{ position: "absolute", inset: 0, bgcolor: "rgba(0,0,0,0.5)" }}
+          />
+          <Box
+            sx={{
+              position: "relative",
+              zIndex: 1,
+              p: 6,
+              color: "white",
+              width: "100%",
+            }}
+          >
             <Typography variant="h4" fontWeight="bold">
               Forward Freedom And Technology.
             </Typography>
-            <Typography variant="body1" sx={{ mt: 1, maxWidth: 400, opacity: 0.8 }}>
-              Accede a tus clases grabadas y materiales de estudio en cualquier momento y lugar.
+            <Typography
+              variant="body1"
+              sx={{ mt: 1, maxWidth: 400, opacity: 0.8 }}
+            >
+              Accede a tus clases grabadas y materiales de estudio en cualquier
+              momento y lugar.
             </Typography>
           </Box>
         </Grid>
@@ -158,47 +179,84 @@ const LoginForm = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Box sx={{ position: "relative" }}>
-                  <TextField
-                    label="Contraseña"
-                    fullWidth
-                    type="password"
-                    placeholder="Ingresa tu contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <IconButton
-                    sx={{
-                      position: "absolute",
-                      right: 8,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                    }}
-                  >
-                    <Visibility />
-                  </IconButton>
-                </Box>
+                {showPassword ? (
+                  <Box sx={{ position: "relative" }}>
+                    <TextField
+                      label="Contraseña"
+                      fullWidth
+                      type="password"
+                      placeholder="Ingresa tu contraseña"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <IconButton
+                      onClick={()=>{
+                        setShowPassword(!showPassword)
+                      }}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <Box sx={{ position: "relative" }}>
+                    <TextField
+                      label="Contraseña"
+                      fullWidth
+                      type="text"
+                      placeholder="Ingresa tu contraseña"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <IconButton
+                     onClick={()=>{
+                        setShowPassword(!showPassword)
+                      }}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                    >
+                      <VisibilityOff />
+                    </IconButton>
+                  </Box>
+                )}
               </Box>
 
               <Box sx={{ position: "relative", mt: 4 }}>
                 {charging ? (
-                  <CircularProgress size={30} sx={{ position: "relative", left: "0%", top: "50%", transform: "translate(-50%, -50%)" }} />
+                  <CircularProgress
+                    size={30}
+                    sx={{
+                      position: "relative",
+                      left: "0%",
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  />
                 ) : (
                   <Button
                     fullWidth
                     variant="contained"
                     sx={{
                       py: 1.5,
-                    fontWeight: 600,
-                    textTransform: "none",
-                    position: "relative",
-                  }}
-                  onClick={validateUser}
-                  disabled={charging}
-                >
+                      fontWeight: 600,
+                      textTransform: "none",
+                      position: "relative",
+                    }}
+                    onClick={validateUser}
+                    disabled={charging}
+                  >
                     Iniciar Sesión
-                </Button>
-                  )}
+                  </Button>
+                )}
               </Box>
 
               {error && (
@@ -208,7 +266,11 @@ const LoginForm = () => {
               )}
 
               <Box sx={{ textAlign: "center", mt: 2 }}>
-                <Link href="#" underline="hover" sx={{ color: "primary.main", fontWeight: 500 }}>
+                <Link
+                  href="/reset-password"
+                  underline="hover"
+                  sx={{ color: "primary.main", fontWeight: 500 }}
+                >
                   Olvidé mi contraseña
                 </Link>
               </Box>

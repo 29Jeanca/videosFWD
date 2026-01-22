@@ -1,8 +1,20 @@
 from pathlib import Path
 from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 
 SECRET_KEY = 'django-insecure-s8g&z$bewk36ste!d95(jnad7+xwzg5+5g)34b84wm8s+e4+2q'
 
@@ -26,6 +38,7 @@ INSTALLED_APPS = [
     'community',
     'events',
     'courses',
+    'cloudinaryImgs',
 ]
 AUTH_USER_MODEL = 'users.User'
 
