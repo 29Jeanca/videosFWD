@@ -47,6 +47,6 @@ class CourseTagsGetView(APIView):
     def get(self,request):
         tags = Course.objects.values_list('tags', flat=True).distinct()
 
-        return Response({"tags": tags.distinct()}, status=status.HTTP_200_OK)
+        return Response({"tags": tags}, status=status.HTTP_200_OK)
     
 
