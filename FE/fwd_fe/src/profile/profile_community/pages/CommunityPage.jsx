@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Grid, Box, Container, Stack, Chip } from "@mui/material";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
@@ -25,9 +24,6 @@ export default function CommunityPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  // -------------------------------
-  // Fetch principal de todos los posts
-  // -------------------------------
   const fetchData = async () => {
     try {
       const posts = await getData();
@@ -40,14 +36,12 @@ export default function CommunityPage() {
       setCreatedPost(posts);
       setOriginalPosts(posts);
 
-      // likes
       const likesObj = {};
       for (const p of posts) {
         const res = await getLikedPosts(p.id);
         likesObj[p.id] = res.length;
       }
 
-      // comentarios
       const commentsObj = {};
       for (const p of posts) {
         const res = await getPostComments(p.id);
@@ -76,22 +70,17 @@ export default function CommunityPage() {
     fetchCommentPost();
   }, []);
 
-  // -------------------------------
-  // Filtrado por Tabs
-  // -------------------------------
   const handleTabFilter = (tabIndex) => {
     let sorted = [...originalPosts];
 
     switch (tabIndex) {
       case 0:
-        // Recientes
         sorted.sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at)
         );
         break;
 
       case 1:
-        // Más Activos (más comentarios)
         sorted.sort(
           (a, b) =>
             (commentsByPost[b.id] ?? 0) -
@@ -100,14 +89,12 @@ export default function CommunityPage() {
         break;
 
       case 2:
-        // Sin Responder
         sorted = sorted.filter(
           (p) => (commentsByPost[p.id] ?? 0) === 0
         );
         break;
 
       case 3:
-        // Más Gustados
         sorted.sort(
           (a, b) =>
             (likesByPost[b.id] ?? 0) -
@@ -122,9 +109,6 @@ export default function CommunityPage() {
     setCreatedPost(sorted);
   };
 
-  // -------------------------------
-  // Render principal
-  // -------------------------------
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Grid container spacing={4}>

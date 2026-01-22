@@ -6,7 +6,7 @@ export default function TabSelection({ onTabChange }) {
 
   const handleChange = (_, newValue) => {
     setValue(newValue);
-    onTabChange(newValue);  // 👈 aquí notificamos al padre qué tab tocó
+    onTabChange(newValue); 
   };
 
   return (

@@ -25,7 +25,7 @@ export default function CategoryChips({ clickedCategory, valueCategory }) {
   return (
     <Box sx={{ width: "100%", mb: 3 }}>
       <Tabs
-        value={clickedCategory} // 🔥 EL ID
+        value={clickedCategory} 
         onChange={handleChange}
         variant="scrollable"
         scrollButtons="auto"

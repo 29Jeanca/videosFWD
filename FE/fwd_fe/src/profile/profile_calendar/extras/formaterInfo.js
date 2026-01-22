@@ -1,6 +1,4 @@
-// formatEvents.js
 
-// Mapa para convertir HEX → nombre
 const COLOR_MAP = {
   "#22c55e": "green",
   "#ef4444": "red",
@@ -9,7 +7,6 @@ const COLOR_MAP = {
   "#a855f7": "purple",
 };
 
-// 🔥 Normaliza los eventos para que ambos modelos tengan el MISMO formato
 function normalizeEvent(event) {
   return {
     title: event.title,
@@ -19,7 +16,6 @@ function normalizeEvent(event) {
   };
 }
 
-// 🔥 Agrupa eventos POR FECHA (YYYY-MM-DD)
 function formatEvents(apiEvents) {
   const eventsByDate = {};
 

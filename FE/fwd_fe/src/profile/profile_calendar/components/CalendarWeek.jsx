@@ -1,4 +1,3 @@
-// CalendarWeek.jsx
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import {
   Box,
@@ -22,7 +21,6 @@ import { es } from "date-fns/locale";
 import ModalCreateWeekEvent from "./ModalCreateWeekEvent";
 import { getAllEvents } from "../services/validate";
 
-/* ------------------------------------- CONFIG ------------------------------------- */
 
 const HOUR_START = 7;
 const HOUR_END = 22;
@@ -38,7 +36,6 @@ const CATEGORY_STYLES = {
   default: { bg: "rgba(238,238,238,0.95)", text: "#374151", border: "rgba(230,230,230,1)" },
 };
 
-/* ------------------------------------- HELPERS ------------------------------------- */
 
 function clamp(v, a, b) {
   return Math.min(Math.max(v, a), b);
@@ -100,7 +97,6 @@ function computeNonOverlappingPositions(events) {
   return placements;
 }
 
-/* ------------------------------------- MAIN ------------------------------------- */
 
 export default function CalendarWeek({ events = [], initialDate = new Date() }) {
   const [anchor, setAnchor] = useState(
@@ -111,15 +107,12 @@ export default function CalendarWeek({ events = [], initialDate = new Date() }) 
 
   const weekStart = useMemo(() => startOfWeek(anchor, { weekStartsOn: 0 }), [anchor]);
 
-  /* 🔥 SOLUCIÓN A — Convertir backend → formato calendario */
   useEffect(() => {
     const fetchEvents = async () => {
       const response = await getAllEvents();
 
-      // Si no es un array → forzamos array vacío
       const rawEvents = Array.isArray(response) ? response : response?.events || [];
 
-      // Agrupamos por día EXACTAMENTE como el calendario espera
       const buckets = Array.from({ length: 7 }, () => []);
 
       rawEvents.forEach((ev) => {
@@ -132,7 +125,6 @@ export default function CalendarWeek({ events = [], initialDate = new Date() }) 
         buckets[dayIndex].push({ ...ev, top, height });
       });
 
-      // Convertimos cada bucket en el formato esperado
       const calendarData = buckets.map((dayEvents) => {
         if (dayEvents.length === 0) return { raw: [], placements: {} };
 

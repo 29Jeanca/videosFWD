@@ -1,6 +1,3 @@
-// ===============================
-// COOKIES
-// ===============================
 export function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {
@@ -17,9 +14,6 @@ export function getCookie(name) {
 }
 
 
-// ===============================
-// USERS
-// ===============================
 const getUserProfile = async () => {
   const response = await fetch("http://localhost:8000/users/me/", {
     method: "GET",
@@ -50,9 +44,6 @@ const patchUserProfile = async (userData) => {
 };
 
 
-// ===============================
-// POSTS
-// ===============================
 const getData = async () => {
   const csrftoken = getCookie("csrftoken");
 
@@ -155,9 +146,6 @@ const deletePost = async (postId) => {
 
 
 
-// ===============================
-// CATEGORIES
-// ===============================
 const getCategories = async () => {
   const csrftoken = getCookie("csrftoken");
 
@@ -176,9 +164,6 @@ const getCategories = async () => {
 };
 
 
-// ===============================
-// COMMENTS
-// ===============================
 const getPostComments = async (postId) => {
   const csrftoken = getCookie("csrftoken");
 
@@ -250,9 +235,6 @@ const deleteComment = async (commentId) => {
 }
 
 
-// ===============================
-// LIKES
-// ===============================
 const postLikeUnlike = async (postId) => {
   const csrftoken = getCookie("csrftoken");
 
@@ -288,9 +270,6 @@ const getLikedPosts = async (postId) => {
 };
 
 
-// ===============================
-// FILTERS
-// ===============================
 const getInfoByFilter = async (filter) => {
   const csrftoken = getCookie("csrftoken");
 
@@ -309,9 +288,6 @@ const getInfoByFilter = async (filter) => {
 };
 
 
-// ===============================
-// EXPORT
-// ===============================
 export {
   getUserProfile,
   patchUserProfile,

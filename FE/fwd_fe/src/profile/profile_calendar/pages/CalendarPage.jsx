@@ -22,7 +22,6 @@ export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Detecta si la pantalla es pequeña
   const isMobile = useMediaQuery("(max-width: 900px)");
 
   const handleViewChange = (_, next) => {

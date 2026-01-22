@@ -1,4 +1,3 @@
-// CalendarDay.jsx
 import React, { useMemo, useState } from "react";
 import {
   Box,
@@ -12,14 +11,6 @@ import ChevronRight from "@mui/icons-material/ChevronRight";
 import { parseISO, format, addDays } from "date-fns";
 import { es } from "date-fns/locale";
 
-/**
- * DIARIO - muestra una columna de un día con horas (09:00 - 17:00)
- * Props:
- *  - initialDate: Date|string (día a mostrar)
- *  - events: [{ id, title, start: ISO, end: ISO, description?, category? }]
- *
- * Nota: formato de eventos IGUAL que Semana
- */
 
 const HOURS = Array.from({ length: 9 }, (_, i) => 9 + i); // 9..17 (9 items)
 const ROW_HEIGHT = 64; // px por hora (ajusta si quieres más/menos altura)
@@ -42,7 +33,6 @@ export default function CalendarDay({ initialDate = new Date(), events = [] }) {
     typeof initialDate === "string" ? new Date(initialDate) : new Date(initialDate)
   );
 
-  // normalize to start of day (local)
   const dayStart = useMemo(() => {
     const d = new Date(dayAnchor);
     d.setHours(0,0,0,0);
@@ -53,14 +43,12 @@ export default function CalendarDay({ initialDate = new Date(), events = [] }) {
   function nextDay() { setDayAnchor(d => { const n = new Date(d); n.setDate(n.getDate() + 1); return n; }); }
   function goToday() { setDayAnchor(new Date()); }
 
-  // filter events that belong to this day and compute top/height
   const dayEvents = useMemo(() => {
     const list = [];
     for (const ev of events) {
       try {
         const s = parseISO(ev.start);
         const e = parseISO(ev.end);
-        // if event's day matches displayed day
         const sDay = new Date(s.getFullYear(), s.getMonth(), s.getDate());
         const targetDay = new Date(dayStart);
         if (sDay.getTime() !== targetDay.getTime()) continue;
@@ -68,7 +56,6 @@ export default function CalendarDay({ initialDate = new Date(), events = [] }) {
         const startHour = s.getHours() + s.getMinutes() / 60;
         const endHour = e.getHours() + e.getMinutes() / 60;
 
-        // clamp to visible window 9..17
         const [vs, ve] = clampToWindow(startHour, endHour, HOURS[0], HOURS[HOURS.length - 1] + 1);
         if (ve <= vs) continue;
 
@@ -85,10 +72,8 @@ export default function CalendarDay({ initialDate = new Date(), events = [] }) {
       } catch (err) {
         console.log(err);
         
-        // ignore invalid event formats
       }
     }
-    // optional: sort by start hour
     list.sort((a, b) => {
       const ai = parseISO(a.start);
       const bi = parseISO(b.start);

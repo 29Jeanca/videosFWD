@@ -1,6 +1,3 @@
-// ===============================
-// COOKIES
-// ===============================
 export function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {

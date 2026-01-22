@@ -16,7 +16,6 @@ export default function Courses() {
       try {
         const response = await getCourses();
 
-        // CONVERTIR TAGS DE STRINGS → OBJETOS
         const formattedCourses = response.map(course => ({
           ...course,
           tags: course.tags.map(tag => ({

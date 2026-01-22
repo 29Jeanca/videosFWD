@@ -21,7 +21,6 @@ export default function NewComment({ onCommentAdded }) {
 
       setContent("");
 
-      // Notifica al padre que debe recargar comentarios
       onCommentAdded();
     } catch (err) {
       console.error("Error al publicar comentario:", err);
