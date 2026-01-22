@@ -7,6 +7,7 @@ import NotFoundPage from "../profile/profile_community/errors/pages/NotFoundPage
 import ActivityPage from "../profile/profile_history/pages/ActivityPage";
 import CalendarPage from "../profile/profile_calendar/pages/CalendarPage";
 import Courses from "../courses/main_courses/pages/Courses";
+import ResetPasswordPage from "../auth/pages/ResetPasswordPage";
 
 const Routing = () => {
   return (
@@ -20,6 +21,7 @@ const Routing = () => {
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/calendario" element={<CalendarPage />} />
         <Route path="/clases" element={<Courses />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
     </Router>
   );
