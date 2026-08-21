@@ -1,0 +1,9 @@
+/* Reset mínimo. MuiCssBaseline (ver src/theme/theme.js) ya aplica su propio reset de
+   margin/box-sizing sobre html/body — esto queda como red de seguridad para nodos
+   fuera del árbol de MUI. La fuente de cuerpo es IBM Plex Sans (docs/BRAND.md §4). */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
