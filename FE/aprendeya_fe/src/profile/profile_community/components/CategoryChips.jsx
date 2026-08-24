@@ -50,7 +50,10 @@ export default function CategoryChips({ clickedCategory, valueCategory }) {
         </Typography>
       ) : (
       <Tabs
-        value={clickedCategory}
+        // MUI's Tabs quiere `false` (no "undefined"/"null") para decir
+        // "ninguna pestaña seleccionada todavía" — sin esto tiraba un
+        // warning constante en consola en cuanto había categorías reales.
+        value={clickedCategory ?? false}
         onChange={handleChange}
         variant="scrollable"
         scrollButtons="auto"

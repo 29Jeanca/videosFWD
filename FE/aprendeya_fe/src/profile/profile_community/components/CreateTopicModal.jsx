@@ -6,6 +6,7 @@ import CategoryChips from "./CategoryChips";
 import { newPost } from "../../services/validate";
 import DialogTopAccent from "../../../components/dialogs/DialogTopAccent";
 import DialogHeader from "../../../components/dialogs/DialogHeader";
+import { useNotify } from "../../../components/notifications/useNotify";
 
 export default function CreateTopicModal({ open, onClose, reloadTopics }) {
   const [title, setTitle] = useState("");
@@ -13,6 +14,7 @@ export default function CreateTopicModal({ open, onClose, reloadTopics }) {
   const [category, setCategory] = useState(null);
   const [anonymous, setAnonymous] = useState(false);
   const [loading, setLoading] = useState(false);
+  const notify = useNotify();
 
   const handleCategorySelect = (catId) => {
     setCategory(catId);
@@ -35,12 +37,18 @@ export default function CreateTopicModal({ open, onClose, reloadTopics }) {
 
     try {
       setLoading(true);
-      await newPost(newTopic);
+      const response = await newPost(newTopic);
+      if (!response || response.error) {
+        notify.error("No se pudo publicar el tema.");
+        return;
+      }
       resetForm();
       onClose();
+      notify.success("Tema publicado.");
       if (reloadTopics) reloadTopics();
     } catch (error) {
       console.error("Error al publicar el tema:", error);
+      notify.error("No se pudo publicar el tema.");
     } finally {
       setLoading(false);
     }

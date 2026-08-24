@@ -44,6 +44,37 @@ class UserEventListCreateView(APIView):
         serializer = UserEventSerializer(user_events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class UserEventDetailView(APIView):
+    # Editar/borrar un evento personal — solo el dueño puede tocarlo (mismo
+    # patrón de ownership que EditPostView/DeletePostView en community).
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, request, pk):
+        return UserEvent.objects.filter(id=pk, user=request.user).first()
+
+    def patch(self, request, pk):
+        user_event = self.get_object(request, pk)
+        if user_event is None:
+            return Response({"error": "Evento no encontrado o no autorizado"}, status=404)
+
+        for field in ('title', 'description', 'date', 'color', 'fecha_inicio', 'fecha_fin'):
+            if field in request.data:
+                setattr(user_event, field, request.data.get(field))
+        user_event.save()
+
+        serializer = UserEventSerializer(user_event)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        user_event = self.get_object(request, pk)
+        if user_event is None:
+            return Response({"error": "Evento no encontrado o no autorizado"}, status=404)
+
+        user_event.delete()
+        return Response({"message": "Evento eliminado correctamente"})
+
+
 class UserEventsAllEventsView(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]

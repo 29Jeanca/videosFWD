@@ -49,6 +49,43 @@ const postEvent = async (eventData) =>{
     console.error(error);
   }
 }
+const patchEvent = async (eventId, eventData) => {
+  const csrftoken = getCookie("csrftoken");
+  try {
+    const response = await fetch(`http://localhost:8000/events/user-events/${eventId}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      credentials: "include",
+      body: JSON.stringify(eventData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const deleteEvent = async (eventId) => {
+  const csrftoken = getCookie("csrftoken");
+  try {
+    const response = await fetch(`http://localhost:8000/events/user-events/${eventId}/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const getUserEvents = async () =>{
   const csrftoken = getCookie("csrftoken");
   try{
@@ -66,4 +103,4 @@ const getUserEvents = async () =>{
     console.error(error);
   }
 }
-export { getAllEvents, postEvent, getUserEvents };
+export { getAllEvents, postEvent, patchEvent, deleteEvent, getUserEvents };

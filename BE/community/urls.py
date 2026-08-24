@@ -28,6 +28,11 @@ from .views import (
     GetLikesByPostView,
     FilterLikeByUserView,
     GetAllLikes,
+
+    # GUARDADOS
+    SaveUnsavePostView,
+    GetSavedByPostView,
+    FilterSavedByUserView,
 )
 
 urlpatterns = [
@@ -67,5 +72,12 @@ urlpatterns = [
     path('likes-by-post/<int:post_id>/', GetLikesByPostView.as_view(), name='likes-by-post'),
     path('likes-by-user/', FilterLikeByUserView.as_view(), name='likes-by-user'),
     path('all-likes/', GetAllLikes.as_view(), name='all-likes'),
+
+    # ============================
+    # GUARDADOS
+    # ============================
+    path('save-unsave-post/<int:post_id>/', SaveUnsavePostView.as_view(), name='save-unsave-post'),
+    path('saved-by-post/<int:post_id>/', GetSavedByPostView.as_view(), name='saved-by-post'),
+    path('saved-posts-by-user/', FilterSavedByUserView.as_view(), name='saved-posts-by-user'),
 
 ]

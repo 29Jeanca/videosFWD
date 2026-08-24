@@ -3,10 +3,12 @@ import { alpha } from "@mui/material/styles";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
 import AppHeader from "../../components/AppHeader";
 import PersonalInfo from "../components/PersonalInfo";
 import GeneralProgress from "../components/GeneralProgress";
 import Courses from "../components/Courses";
+import SavedPosts from "../components/SavedPosts";
 import { getUserProfile } from "../services/validate";
 import { fontFamilies } from "../../theme/theme";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 const SECCIONES = [
   { label: "Mi progreso", icon: <TrendingUpOutlinedIcon fontSize="small" /> },
   { label: "Mis clases", icon: <SchoolOutlinedIcon fontSize="small" /> },
+  { label: "Guardados", icon: <BookmarksOutlinedIcon fontSize="small" /> },
   { label: "Datos personales", icon: <BadgeOutlinedIcon fontSize="small" /> },
 ];
 
@@ -29,6 +32,7 @@ export default function ProfilePage() {
   const refs = {
     "Mi progreso": useRef(null),
     "Mis clases": useRef(null),
+    Guardados: useRef(null),
     "Datos personales": useRef(null),
   };
 
@@ -213,6 +217,9 @@ export default function ProfilePage() {
               </Box>
               <Box ref={refs["Mis clases"]}>
                 <Courses />
+              </Box>
+              <Box ref={refs["Guardados"]}>
+                <SavedPosts />
               </Box>
               <Box ref={refs["Datos personales"]}>
                 <PersonalInfo />

@@ -1,0 +1,9 @@
+# Secretos y credenciales — nunca versionar
+.env
+CREDENCIALES_DEV.md
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/

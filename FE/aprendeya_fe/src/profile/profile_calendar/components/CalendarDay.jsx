@@ -4,6 +4,7 @@ import { alpha } from "@mui/material/styles";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import ChevronRight from "@mui/icons-material/ChevronRight";
 import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useNavigate } from "react-router-dom";
 import { getAllEvents } from "../services/validate";
 import ModalCreateEvent from "./ModalCreateEvent";
@@ -92,10 +93,38 @@ export default function CalendarDay({ initialDate = new Date() }) {
     setShowModal(true);
   };
 
+  const openEditModal = (ev) => {
+    if (!ev.isOwn) return;
+    setInfoEvent({
+      id: ev.id,
+      title: ev.title,
+      description: ev.description || "",
+      date: key,
+      color: ev.color,
+    });
+    setShowModal(true);
+  };
+
   const handleSaveEvent = (eventData) => {
+    setEventsInfo((prev) => {
+      const existing = prev[eventData.date] || [];
+      const entry = {
+        id: eventData.id,
+        title: eventData.title,
+        description: eventData.description,
+        color: eventData.color,
+        isOwn: true,
+      };
+      const withoutThisOne = eventData.id ? existing.filter((ev) => ev.id !== eventData.id) : existing;
+      return { ...prev, [eventData.date]: [...withoutThisOne, entry] };
+    });
+    setShowModal(false);
+  };
+
+  const handleDeleteEvent = (eventId, date) => {
     setEventsInfo((prev) => ({
       ...prev,
-      [eventData.date]: [...(prev[eventData.date] || []), { title: eventData.title, color: eventData.color }],
+      [date]: (prev[date] || []).filter((ev) => ev.id !== eventId),
     }));
     setShowModal(false);
   };
@@ -178,7 +207,9 @@ export default function CalendarDay({ initialDate = new Date() }) {
             const hex = EVENT_COLOR_HEX[ev.color] || EVENT_COLOR_HEX.blue;
             return (
               <Box
-                key={i}
+                key={ev.id ?? i}
+                onClick={ev.isOwn ? () => openEditModal(ev) : undefined}
+                title={ev.isOwn ? "Editar evento" : undefined}
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -188,10 +219,14 @@ export default function CalendarDay({ initialDate = new Date() }) {
                   bgcolor: alpha(hex, 0.1),
                   border: "1px solid",
                   borderColor: alpha(hex, 0.3),
+                  cursor: ev.isOwn ? "pointer" : "default",
+                  transition: "box-shadow 120ms ease",
+                  "&:hover": ev.isOwn ? { boxShadow: `inset 0 0 0 1.5px ${hex}` } : undefined,
                 }}
               >
                 <Box sx={{ width: 10, height: 10, borderRadius: "999px", bgcolor: hex, flexShrink: 0 }} />
-                <Typography sx={{ fontSize: 15, fontWeight: 600, color: "text.primary" }}>{ev.title}</Typography>
+                <Typography sx={{ fontSize: 15, fontWeight: 600, color: "text.primary", flex: 1 }}>{ev.title}</Typography>
+                {ev.isOwn && <EditOutlinedIcon sx={{ fontSize: 16, color: hex, opacity: 0.7 }} />}
               </Box>
             );
           })
@@ -203,6 +238,7 @@ export default function CalendarDay({ initialDate = new Date() }) {
           open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveEvent}
+          onDelete={handleDeleteEvent}
           infoEvent={infoEvent}
         />
       )}

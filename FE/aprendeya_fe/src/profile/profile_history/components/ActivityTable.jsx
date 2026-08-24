@@ -20,6 +20,7 @@ import {
   postLikeUnlike,
 } from "../../services/validate";
 import EditCommentModal from "./EditCommentModal";
+import { useNotify } from "../../../components/notifications/useNotify";
 
 // Mapea el tipo de fila a la copia/color de la insignia "Tipo" del mockup.
 // El mockup incluye un tercer tipo "Entrega" (verde, submission) que no existe
@@ -51,6 +52,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditCommentModal, setShowEditCommentModal] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const notify = useNotify();
   const formaterDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CR", {
@@ -193,21 +195,13 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
                         tabIndex={0}
                         sx={{ color: "error.main", cursor: "pointer" }}
                         onClick={() => {
-                          if (row.is_post) {
-                            setShowDeleteModal(true);
-                            setSelectedTopic(row);
-                            reloadInfo();
-                          }
-                          if (row.is_like) {
-                            setShowDeleteModal(true);
-                            setSelectedTopic(row);
-                            reloadInfo();
-                          }
-                          if (row.is_comment) {
-                            setShowDeleteModal(true);
-                            setSelectedTopic(row);
-                            reloadInfo();
-                          }
+                          // Antes esto llamaba reloadInfo() acá mismo, antes de
+                          // que el usuario confirmara nada en el modal — no
+                          // tenía efecto salvo repetir el mismo fetch (el
+                          // borrado real todavía no había pasado). El reload
+                          // que importa es el de onConfirm, más abajo.
+                          setShowDeleteModal(true);
+                          setSelectedTopic(row);
                         }}
                       >
                         Borrar
@@ -237,18 +231,21 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
               setShowDeleteModal(false);
               if (selectedTopic.is_post) {
                 deleteInfo(selectedTopic.id).then(() => {
+                  notify.success("Tema eliminado.");
                   reloadInfo();
                 });
                 return;
               }
               if (selectedTopic.is_like) {
                 unlikePost(selectedTopic.post).then(() => {
+                  notify.success("Se quitó de útil.");
                   reloadInfo();
                 });
                 return;
               }
               if (selectedTopic.is_comment) {
                 deleteCommentPost(selectedTopic.id).then(() => {
+                  notify.success("Comentario eliminado.");
                   reloadInfo();
                 });
                 return;
@@ -278,6 +275,7 @@ export default function ActivityTable({ info, showEdit, reloadInfo }) {
             onSave={(newText) => {
               editCommentPost(selectedTopic.id, newText).then(() => {
                 setShowEditCommentModal(false);
+                notify.success("Comentario actualizado.");
                 reloadInfo();
               });
             }}

@@ -270,6 +270,54 @@ const getLikedPosts = async (postId) => {
 };
 
 
+const postSaveUnsave = async (postId) => {
+  const csrftoken = getCookie("csrftoken");
+
+  const response = await fetch(`http://localhost:8000/community/save-unsave-post/${postId}/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+const getSavedByPost = async (postId) => {
+  const csrftoken = getCookie("csrftoken");
+
+  const response = await fetch(`http://localhost:8000/community/saved-by-post/${postId}/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+const getSavedPostsByUser = async () => {
+  const csrftoken = getCookie("csrftoken");
+
+  const response = await fetch(`http://localhost:8000/community/saved-posts-by-user/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
+    },
+    credentials: "include",
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 const getInfoByFilter = async (filter) => {
   const csrftoken = getCookie("csrftoken");
 
@@ -296,6 +344,9 @@ export {
   getPostComments,
   postLikeUnlike,
   getLikedPosts,
+  postSaveUnsave,
+  getSavedByPost,
+  getSavedPostsByUser,
   newPost,
   getPostById,
   getPostByCategory,

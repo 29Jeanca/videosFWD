@@ -29,8 +29,16 @@ function formatEvents(apiEvents) {
     }
 
     eventsByDate[dateKey].push({
+      id: event.id,
       title: event.title,
+      description: event.description,
       color: event.color,
+      // El endpoint "all-events" mezcla eventos globales (Event, sin dueño)
+      // con eventos personales (UserEvent, sí tiene `user`) en una sola
+      // lista sin marcar de dónde viene cada uno — la presencia de `user`
+      // es la única forma de distinguirlos hoy. Solo los propios se pueden
+      // editar/borrar (ver CalendarMonth/Week/Day).
+      isOwn: Object.prototype.hasOwnProperty.call(event, "user"),
     });
   });
 

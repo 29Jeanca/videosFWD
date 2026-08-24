@@ -2,10 +2,12 @@ import { Box, TextField, Button, Typography } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { postNewComment } from "../../services/validate";
+import { useNotify } from "../../../components/notifications/useNotify";
 
 export default function NewComment({ onCommentAdded }) {
   const { postId } = useParams();
   const [content, setContent] = useState("");
+  const notify = useNotify();
 
   const postComment = async () => {
     if (!content.trim()) return;
@@ -17,13 +19,18 @@ export default function NewComment({ onCommentAdded }) {
 
     try {
       const response = await postNewComment(objComment);
-      console.log(response);
+
+      if (!response || response.error) {
+        notify.error("No se pudo publicar la respuesta.");
+        return;
+      }
 
       setContent("");
-
+      notify.success("Respuesta publicada.");
       onCommentAdded();
     } catch (err) {
       console.error("Error al publicar comentario:", err);
+      notify.error("No se pudo publicar la respuesta.");
     }
   };
 

@@ -9,10 +9,12 @@ import {
   Box,
 } from "@mui/material";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
-import { postEvent } from "../services/validate";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { postEvent, patchEvent, deleteEvent } from "../services/validate";
 import DialogTopAccent from "../../../components/dialogs/DialogTopAccent";
 import DialogHeader from "../../../components/dialogs/DialogHeader";
 import ColorSwatchPicker from "../../../components/dialogs/ColorSwatchPicker";
+import { useNotify } from "../../../components/notifications/useNotify";
 
 const COLORS = [
   { name: "green", hex: "#22c55e", label: "Verde" },
@@ -22,19 +24,57 @@ const COLORS = [
   { name: "purple", hex: "#a855f7", label: "Violeta" },
 ];
 
-export default function ModalCreateEvent({ open, onClose, onSave, infoEvent }) {
+// Sirve tanto para crear como para editar: si `infoEvent.id` viene con
+// valor, es un evento propio existente (ver CalendarMonth/Week/Day — solo
+// se puede llegar a este modo tocando un evento que YO creé) y el modal
+// pasa a modo edición (PATCH + botón de borrar) en vez de crear uno nuevo.
+export default function ModalCreateEvent({ open, onClose, onSave, onDelete, infoEvent }) {
   const [title, setTitle] = useState(infoEvent.title || "");
   const [description, setDescription] = useState(infoEvent.description || "");
   const [color, setColor] = useState(infoEvent.color || "green");
+  const [deleting, setDeleting] = useState(false);
+  const notify = useNotify();
 
+  const isEditing = Boolean(infoEvent.id);
   const isDisabled = title.trim() === "" || description.trim() === "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isDisabled) return;
-    const response = await postEvent({ title, description, color, date: infoEvent.date });
-    console.log(response);
-    onSave({ title, description, color, date: infoEvent.date });
+
+    if (isEditing) {
+      const response = await patchEvent(infoEvent.id, { title, description, color });
+      if (!response || response.error) {
+        notify.error("No se pudo guardar el evento.");
+        return;
+      }
+      notify.success("Evento actualizado.");
+      onSave({ id: infoEvent.id, title, description, color, date: infoEvent.date });
+    } else {
+      const response = await postEvent({ title, description, color, date: infoEvent.date });
+      if (!response || response.error) {
+        notify.error("No se pudo crear el evento.");
+        return;
+      }
+      notify.success("Evento creado.");
+      // El backend devuelve el id real del evento recién creado — sin
+      // pasarlo, el evento quedaba sin id en el estado local y tocarlo antes
+      // de recargar la página abría "Añadir evento" en vez de "Editar
+      // evento" (un evento no se podía distinguir de uno nuevo).
+      onSave({ id: response.id, title, description, color, date: infoEvent.date });
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    const response = await deleteEvent(infoEvent.id);
+    setDeleting(false);
+    if (!response || response.error) {
+      notify.error("No se pudo eliminar el evento.");
+      return;
+    }
+    notify.success("Evento eliminado.");
+    onDelete?.(infoEvent.id, infoEvent.date);
   };
 
   return (
@@ -48,8 +88,12 @@ export default function ModalCreateEvent({ open, onClose, onSave, infoEvent }) {
       <DialogTopAccent />
       <DialogHeader
         icon={<EventAvailableOutlinedIcon />}
-        title="Añadir evento"
-        subtitle="Rellená los detalles para el nuevo evento en el calendario."
+        title={isEditing ? "Editar evento" : "Añadir evento"}
+        subtitle={
+          isEditing
+            ? "Modificá los detalles o eliminá este evento."
+            : "Rellená los detalles para el nuevo evento en el calendario."
+        }
         onClose={onClose}
       />
 
@@ -81,13 +125,33 @@ export default function ModalCreateEvent({ open, onClose, onSave, infoEvent }) {
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 3, pt: 1, borderTop: (theme) => `1px solid ${theme.palette.divider}` }}>
-          <Button variant="outlined" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button type="submit" variant="contained" disabled={isDisabled}>
-            Guardar evento
-          </Button>
+        <DialogActions
+          sx={{
+            px: 3,
+            pb: 3,
+            pt: 1,
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+            justifyContent: isEditing ? "space-between" : "flex-end",
+          }}
+        >
+          {isEditing && (
+            <Button
+              color="error"
+              startIcon={<DeleteOutlineIcon fontSize="small" />}
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              Eliminar
+            </Button>
+          )}
+          <Box sx={{ display: "flex", gap: 1.25 }}>
+            <Button variant="outlined" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained" disabled={isDisabled}>
+              {isEditing ? "Guardar cambios" : "Guardar evento"}
+            </Button>
+          </Box>
         </DialogActions>
       </form>
     </Dialog>

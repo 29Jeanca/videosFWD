@@ -3,12 +3,13 @@
 # ============================
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView
-from .models import Post, CategoryPost, CommentPost, LikePost
+from .models import Post, CategoryPost, CommentPost, LikePost, SavedPost
 from .serializers import (
     PostSerializer,
     CategoryPostSerializer,
     CommentPostSerializer,
-    LikePostSerializer
+    LikePostSerializer,
+    SavedPostSerializer
 )
 from rest_framework.permissions import IsAuthenticated
 from users.authentication import CookieJWTAuthentication
@@ -180,6 +181,51 @@ class GetLikesByPostView(APIView):
     def get(self, request, post_id):
         post = LikePost.objects.filter(post_id=post_id)
         serializer = LikePostSerializer(post, many=True)
+        return Response(serializer.data)
+
+
+# ============================
+# PUBLICACIONES GUARDADAS (sección "Guardados" del perfil)
+# ============================
+class SaveUnsavePostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        user = request.user
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({"error": "Post no encontrado"}, status=404)
+
+        saved_instance = SavedPost.objects.filter(user=user, post=post).first()
+
+        if saved_instance:
+            saved_instance.delete()
+            return Response({"message": "Post unsaved", "saved": False})
+        else:
+            SavedPost.objects.create(user=user, post=post)
+            return Response({"message": "Post saved", "saved": True})
+
+
+class GetSavedByPostView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, post_id):
+        saved = SavedPost.objects.filter(post_id=post_id)
+        serializer = SavedPostSerializer(saved, many=True)
+        return Response(serializer.data)
+
+
+class FilterSavedByUserView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        saved = SavedPost.objects.filter(user=user).order_by('-created_at')
+        serializer = SavedPostSerializer(saved, many=True)
         return Response(serializer.data)
 
 

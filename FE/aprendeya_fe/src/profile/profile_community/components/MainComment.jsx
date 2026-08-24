@@ -1,11 +1,21 @@
 import { Box, Avatar, Typography, Chip, Button } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import { useEffect, useState } from "react";
-import { getPostById, postLikeUnlike, getLikedPosts } from "../../services/validate";
+import {
+  getPostById,
+  postLikeUnlike,
+  getLikedPosts,
+  postSaveUnsave,
+  getSavedByPost,
+  getUserProfile,
+} from "../../services/validate";
 import { useNavigate } from "react-router-dom";
 import { brandTokens, fontMono } from "../../../theme/theme";
+import { useNotify } from "../../../components/notifications/useNotify";
 
 const getInitials = (name) => {
   if (!name) return "?";
@@ -20,7 +30,10 @@ const getInitials = (name) => {
 export default function MainComment({ postId }) {
   const [contentPost, setContentPost] = useState([]);
   const [likesByPost, setLikesByPost] = useState({});
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
   const navigate = useNavigate();
+  const notify = useNotify();
 
   useEffect(() => {
     const fetchPostDetails = async () => {
@@ -38,11 +51,18 @@ export default function MainComment({ postId }) {
 
         setContentPost(data);
 
-        const likes = await getLikedPosts(data.id);
+        const [me, likes, savedRows] = await Promise.all([
+          getUserProfile(),
+          getLikedPosts(data.id),
+          getSavedByPost(data.id),
+        ]);
+
         setLikesByPost((prev) => ({
           ...prev,
           [data.id]: likes.length,
         }));
+        setLiked(likes.some((like) => like.user_id === me.id || like.user === me.id));
+        setSaved(savedRows.some((row) => row.user === me.id));
       } catch (error) {
         console.error(error);
       }
@@ -167,8 +187,10 @@ export default function MainComment({ postId }) {
 
       <Box sx={{ display: "flex", gap: 1.25, pt: 0.5 }}>
         <Button
-          variant="outlined"
-          startIcon={<ThumbUpIcon sx={{ fontSize: 16 }} />}
+          variant={liked ? "contained" : "outlined"}
+          startIcon={
+            liked ? <ThumbUpIcon sx={{ fontSize: 16 }} /> : <ThumbUpOutlinedIcon sx={{ fontSize: 16 }} />
+          }
           onClick={async () => {
             const response = await postLikeUnlike(contentPost.id);
 
@@ -177,38 +199,62 @@ export default function MainComment({ postId }) {
               return;
             }
 
+            const nowLiked = response?.message === "Post liked";
+            setLiked(nowLiked);
+            notify.success(nowLiked ? "Marcado como útil." : "Se quitó de útil.");
+
             const res = await getLikedPosts(contentPost.id);
             setLikesByPost((prev) => ({
               ...prev,
               [contentPost.id]: res.length,
             }));
           }}
-          sx={{
-            height: 40,
-            px: 2,
-            fontSize: 14,
-            fontWeight: 600,
-            color: "text.primary",
-            borderColor: "divider",
-            "&:hover": { borderColor: "primary.light", bgcolor: "transparent" },
-          }}
+          sx={
+            liked
+              ? { height: 40, px: 2, fontSize: 14, fontWeight: 600 }
+              : {
+                  height: 40,
+                  px: 2,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "text.primary",
+                  borderColor: "divider",
+                  "&:hover": { borderColor: "primary.light", bgcolor: "transparent" },
+                }
+          }
         >
           Útil · {likesByPost[contentPost.id] ?? 0}
         </Button>
         <Button
-          variant="outlined"
-          startIcon={<BookmarkBorderIcon sx={{ fontSize: 16 }} />}
-          sx={{
-            height: 40,
-            px: 2,
-            fontSize: 14,
-            fontWeight: 600,
-            color: "text.primary",
-            borderColor: "divider",
-            "&:hover": { borderColor: "primary.light", bgcolor: "transparent" },
+          variant={saved ? "contained" : "outlined"}
+          color={saved ? "secondary" : "primary"}
+          startIcon={saved ? <BookmarkIcon sx={{ fontSize: 16 }} /> : <BookmarkBorderIcon sx={{ fontSize: 16 }} />}
+          onClick={async () => {
+            const response = await postSaveUnsave(contentPost.id);
+
+            if (response?.detail === "Authentication credentials were not provided.") {
+              navigate("/");
+              return;
+            }
+
+            setSaved(Boolean(response?.saved));
+            notify.success(response?.saved ? "Publicación guardada." : "Se quitó de guardados.");
           }}
+          sx={
+            saved
+              ? { height: 40, px: 2, fontSize: 14, fontWeight: 600 }
+              : {
+                  height: 40,
+                  px: 2,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "text.primary",
+                  borderColor: "divider",
+                  "&:hover": { borderColor: "primary.light", bgcolor: "transparent" },
+                }
+          }
         >
-          Guardar
+          {saved ? "Guardado" : "Guardar"}
         </Button>
       </Box>
     </Box>

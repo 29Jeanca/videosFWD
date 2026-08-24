@@ -116,15 +116,52 @@ export default function CalendarMonth({ initialDate = new Date() }) {
   }
 
   const handleSaveEvent = (eventData) => {
-    // El modal ya persistió el evento en el backend (postEvent) — acá solo lo
-    // reflejamos en el estado local para que aparezca al instante, sin
-    // esperar a un refetch/recarga de página.
+    // El modal ya persistió el evento en el backend (postEvent/patchEvent) —
+    // acá solo lo reflejamos en el estado local para que aparezca al
+    // instante, sin esperar a un refetch/recarga de página.
     const key = eventData.date;
+    setEventsInfo((prev) => {
+      const existing = prev[key] || [];
+      const entry = {
+        id: eventData.id,
+        title: eventData.title,
+        description: eventData.description,
+        color: eventData.color,
+        isOwn: true,
+      };
+      const withoutThisOne = eventData.id ? existing.filter((ev) => ev.id !== eventData.id) : existing;
+      return { ...prev, [key]: [...withoutThisOne, entry] };
+    });
+    setShowModal(false);
+  };
+
+  const handleDeleteEvent = (eventId, date) => {
     setEventsInfo((prev) => ({
       ...prev,
-      [key]: [...(prev[key] || []), { title: eventData.title, color: eventData.color }],
+      [date]: (prev[date] || []).filter((ev) => ev.id !== eventId),
     }));
     setShowModal(false);
+  };
+
+  const openCreateModal = (day) => {
+    const key = formatKey(day);
+    setSelectedDate(key);
+    setInfoEvent({ title: "", description: "", date: key, color: "green" });
+    setShowModal(true);
+  };
+
+  const openEditModal = (ev, key, e) => {
+    e.stopPropagation();
+    if (!ev.isOwn) return;
+    setSelectedDate(key);
+    setInfoEvent({
+      id: ev.id,
+      title: ev.title,
+      description: ev.description || "",
+      date: key,
+      color: ev.color,
+    });
+    setShowModal(true);
   };
 
   return (
@@ -234,17 +271,7 @@ export default function CalendarMonth({ initialDate = new Date() }) {
             return (
               <Box
                 key={key + idx}
-                onClick={() => {
-                  setSelectedDate(key);
-                  setShowModal(true);
-                  console.log("Clicked", key);
-                  setInfoEvent({
-                    title: "",
-                    description: "",
-                    date: key,
-                    color: "green",
-                  });
-                }}
+                onClick={() => openCreateModal(day)}
                 sx={{
                   p: "10px",
                   minHeight: 116,
@@ -290,12 +317,17 @@ export default function CalendarMonth({ initialDate = new Date() }) {
                   </Typography>
                 )}
 
-                {/* Events */}
+                {/* Events — solo los propios (isOwn) se pueden tocar para
+                    editar; el resto son de solo lectura (eventos globales de
+                    la plataforma, no del usuario). stopPropagation evita que
+                    el clic también dispare "crear evento" en la celda. */}
                 {events.map((ev, i) => {
                   const hex = EVENT_COLOR_HEX[ev.color] || EVENT_COLOR_HEX.blue;
                   return (
                     <Box
-                      key={i}
+                      key={ev.id ?? i}
+                      onClick={ev.isOwn ? (e) => openEditModal(ev, key, e) : (e) => e.stopPropagation()}
+                      title={ev.isOwn ? "Editar evento" : undefined}
                       sx={{
                         fontSize: 12,
                         fontWeight: 600,
@@ -306,6 +338,9 @@ export default function CalendarMonth({ initialDate = new Date() }) {
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
+                        cursor: ev.isOwn ? "pointer" : "default",
+                        transition: "box-shadow 120ms ease",
+                        "&:hover": ev.isOwn ? { boxShadow: `inset 0 0 0 1.5px ${hex}` } : undefined,
                       }}
                     >
                       {ev.title}
@@ -341,6 +376,7 @@ export default function CalendarMonth({ initialDate = new Date() }) {
           open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveEvent}
+          onDelete={handleDeleteEvent}
           date={selectedDate}
           infoEvent={infoEvent}
         />

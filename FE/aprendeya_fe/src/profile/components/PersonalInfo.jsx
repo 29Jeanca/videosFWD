@@ -2,6 +2,7 @@ import { Box, Card, CardContent, Typography, Stack, Button, TextField } from "@m
 import { getUserProfile, patchUserProfile } from "../services/validate";
 import { useEffect, useState } from "react";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { useNotify } from "../../components/notifications/useNotify";
 
 function Campo({ label, value }) {
   return (
@@ -32,6 +33,7 @@ export default function PersonalInfo() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const notify = useNotify();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -52,7 +54,6 @@ export default function PersonalInfo() {
   }, []);
 
   const handleEdit = async () => {
-    console.log("Datos guardados:", { username, firstName, lastName, email });
     const newObjUser = {
       username: username,
       first_name: firstName,
@@ -60,10 +61,13 @@ export default function PersonalInfo() {
       email: email,
       password: userData.password,
     };
-    console.log("Nuevo objeto de usuario:", newObjUser);
     const response = await patchUserProfile(newObjUser);
-    console.log("Respuesta del servidor:", response);
+    if (!response) {
+      notify.error("No se pudieron guardar los cambios.");
+      return;
+    }
     setEdit(false);
+    notify.success("Datos personales actualizados.");
   };
 
   return (

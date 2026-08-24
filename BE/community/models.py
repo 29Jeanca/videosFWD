@@ -42,3 +42,18 @@ class AnswerComment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     anonymous = models.BooleanField(default=False)
     thumbs_up = models.IntegerField(default=0)
+
+
+class SavedPost(models.Model):
+    # Sección "Publicaciones guardadas" del perfil — mismo patrón que LikePost
+    # (toggle guardar/quitar), no un simple booleano en Post porque un post
+    # puede estar guardado por varios usuarios a la vez.
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('post', 'user')
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.post.title}"

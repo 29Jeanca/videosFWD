@@ -6,8 +6,10 @@ import { editPost } from "../../services/validate";
 import CategoryChips from "../../profile_community/components/CategoryChips";
 import DialogTopAccent from "../../../components/dialogs/DialogTopAccent";
 import DialogHeader from "../../../components/dialogs/DialogHeader";
+import { useNotify } from "../../../components/notifications/useNotify";
 
 export default function EditTopicModal({ open, onClose, reloadTopics, existingTopic }) {
+  const notify = useNotify();
   const [title, setTitle] = useState(existingTopic ? existingTopic.title : "");
   const [content, setContent] = useState(existingTopic ? existingTopic.content : "");
   const [category, setCategory] = useState(existingTopic ? existingTopic.category : null);
@@ -26,8 +28,12 @@ export default function EditTopicModal({ open, onClose, reloadTopics, existingTo
     };
 
     const editedTopic = await editPost(existingTopic.id, newTopic);
-    console.log(editedTopic);
+    if (!editedTopic || editedTopic.error) {
+      notify.error("No se pudo guardar el tema.");
+      return;
+    }
     onClose();
+    notify.success("Tema actualizado.");
 
     if (reloadTopics) reloadTopics();
   };
