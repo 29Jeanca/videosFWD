@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/validate";
 import { useTema } from "../../theme/useTema";
 import Logo29 from "../../components/Logo29";
+import DemoCredentialsMenu from "./DemoCredentialsMenu";
 
 // Ícono del botón de tema: refleja la preferencia activa, no solo el modo resuelto
 // (así "sistema" se distingue de "claro"/"oscuro" aunque hoy resuelvan igual).
@@ -178,6 +179,13 @@ const LoginForm = () => {
               Tu ruta, tus ejercicios y las respuestas de tus mentores siguen exactamente donde los dejaste.
             </Typography>
           </Box>
+
+          <DemoCredentialsMenu
+            onSelect={(demoEmail, demoPassword) => {
+              setEmail(demoEmail);
+              setPassword(demoPassword);
+            }}
+          />
 
           <Box component="form" noValidate sx={{ display: "grid", gap: 2.25 }}>
             <CampoConLabel label="Correo">

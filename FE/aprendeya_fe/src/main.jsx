@@ -14,6 +14,15 @@ import '@fontsource/jetbrains-mono/400.css'
 import '@fontsource/jetbrains-mono/600.css'
 
 import { TemaProvider } from './theme/TemaContext'
+import { installMockFetch } from './mocks/installMockFetch'
+
+// Backend simulado (ver src/mocks/README.md): activo por default para que
+// el deploy de solo-FE funcione sin depender de BE/ corriendo en ningún
+// lado. Poner VITE_USE_MOCK_API=false en .env.local para volver a pegarle
+// al backend real de Django en desarrollo.
+if (import.meta.env.VITE_USE_MOCK_API !== 'false') {
+  installMockFetch()
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

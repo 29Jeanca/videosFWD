@@ -1,5 +1,13 @@
 # React + Vite
 
+## Backend simulado (deploy solo-FE)
+
+Por default esta app corre con un backend simulado 100% en el cliente
+(datos "quemados" + `localStorage`, sin depender de `BE/`) — ver
+[`src/mocks/README.md`](src/mocks/README.md) para el detalle y las
+credenciales de prueba. Se desactiva con `VITE_USE_MOCK_API=false` en
+`.env.local` (ver `.env.example`) para volver a pegarle al backend real.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
