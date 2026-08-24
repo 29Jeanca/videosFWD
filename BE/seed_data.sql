@@ -33,7 +33,7 @@ INSERT INTO users_user
   (password, last_login, is_superuser, username, first_name, last_name, email,
    is_staff, is_active, date_joined, profile_picture, role)
 VALUES
-  ('pbkdf2_sha256$1000000$HKuyLuB3KtOiSYY8obZCwC$+MlVC05da3zWdaexzzay6cNW5V9Gnmm7BxZZIjzMbRE=',
+  ('pbkdf2_sha256$1000000$Ax6Xmd9A1NkvqladtBNKXF$k1+1WrrtOjoWZrfXt6WhOoIz3Upf7Vy2KRttQOECqHA=',
    NULL, 0, 'ana.rojas', 'Ana', 'Rojas', 'ana.rojas@correo.com', 0, 1, NOW(), NULL, 'student');
 SET @user_ana = LAST_INSERT_ID();
 
@@ -41,7 +41,7 @@ INSERT INTO users_user
   (password, last_login, is_superuser, username, first_name, last_name, email,
    is_staff, is_active, date_joined, profile_picture, role)
 VALUES
-  ('pbkdf2_sha256$1000000$kIVLoVeIFjEufjNvroK97J$3Gp9GHsl0/ZT5EA0X90QSlkxL7FJSiQ8N4h74qW5oTQ=',
+  ('pbkdf2_sha256$1000000$uszvU1rCYr6wAJskKzQCrY$H59kgu2smw+CYa1o+Jn79Ynw7BnoKDx7xPSsomnf3sQ=',
    NULL, 0, 'carlos.mendez', 'Carlos', 'Méndez', 'carlos.mendez@correo.com', 0, 1, NOW(), NULL, 'student');
 SET @user_carlos = LAST_INSERT_ID();
 
@@ -49,7 +49,7 @@ INSERT INTO users_user
   (password, last_login, is_superuser, username, first_name, last_name, email,
    is_staff, is_active, date_joined, profile_picture, role)
 VALUES
-  ('pbkdf2_sha256$1000000$LiHyOsos31W1Zy4ZWeGySO$8SUyEbrBQkSzfhVbsMGFc2SLMmD6MTH3YRp1Dd8sfXQ=',
+  ('pbkdf2_sha256$1000000$mfVeYJtT43S9HKIlR7um6j$8LHFpnvBRv9RZvO1MxdWcGhOU/uXcEKfi6KY6PA2lO4=',
    NULL, 0, 'sofia.vargas', 'Sofía', 'Vargas', 'sofia.vargas@correo.com', 0, 1, NOW(), NULL, 'student');
 SET @user_sofia = LAST_INSERT_ID();
 
@@ -57,7 +57,7 @@ INSERT INTO users_user
   (password, last_login, is_superuser, username, first_name, last_name, email,
    is_staff, is_active, date_joined, profile_picture, role)
 VALUES
-  ('pbkdf2_sha256$1000000$zoUavQP9TCEBtkFuB0zpI4$lnpJOUko3SWrjD6e0x0OUkwRhylXnM593VNt7szdE1s=',
+  ('pbkdf2_sha256$1000000$mdOBrht0RMrKUfT6VDDblO$5QS9iZqu5sfx9NWKWy10omflPEX7A/6brnbWOHDxCEk=',
    NULL, 0, 'luis.fernandez', 'Luis', 'Fernández', 'luis.fernandez@correo.com', 0, 1, NOW(), NULL, 'teacher');
 SET @user_luis = LAST_INSERT_ID();
 
@@ -65,7 +65,7 @@ INSERT INTO users_user
   (password, last_login, is_superuser, username, first_name, last_name, email,
    is_staff, is_active, date_joined, profile_picture, role)
 VALUES
-  ('pbkdf2_sha256$1000000$inm5ymy0eEXZgBWsOb9wd1$/x1uaFxAkgFntUZT2QtRdodRU1KJ1JDjNcZGeybIFRM=',
+  ('pbkdf2_sha256$1000000$uHLhWUHl9JcP9RwBPsbBS8$9q6A/7RJGHpoW4Fko0IPJZudFvY5HuuH1a9awFZJ84U=',
    NULL, 1, 'admin.29aprendeya', 'Admin', '29AprendeYa', 'admin@29aprendeya.com', 1, 1, NOW(), NULL, 'admin');
 SET @user_admin = LAST_INSERT_ID();
 
