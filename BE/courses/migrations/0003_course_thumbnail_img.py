@@ -1,0 +1,18 @@
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('courses', '0002_alter_course_tags'),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='course',
+            name='thumbnail_img',
+            field=models.URLField(default='https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg'),
+            preserve_default=False,
+        ),
+    ]

@@ -1,0 +1,44 @@
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('community', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='post',
+            name='thumbs_up',
+            field=models.IntegerField(default=0),
+        ),
+        migrations.CreateModel(
+            name='CommentPost',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('content', models.TextField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('anonymous', models.BooleanField(default=False)),
+                ('thumbs_up', models.IntegerField(default=0)),
+                ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='community.post')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='AnswerComment',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('content', models.TextField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('anonymous', models.BooleanField(default=False)),
+                ('thumbs_up', models.IntegerField(default=0)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('comment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='community.commentpost')),
+            ],
+        ),
+    ]

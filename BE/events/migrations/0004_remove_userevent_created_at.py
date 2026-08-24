@@ -1,0 +1,16 @@
+
+from django.db import migrations
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('events', '0003_rename_color_event_event_color_and_more'),
+    ]
+
+    operations = [
+        migrations.RemoveField(
+            model_name='userevent',
+            name='created_at',
+        ),
+    ]
