@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd FE/aprendeya_fe && npm ci",
+  "buildCommand": "cd FE/aprendeya_fe && npm run build",
+  "outputDirectory": "FE/aprendeya_fe/dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
